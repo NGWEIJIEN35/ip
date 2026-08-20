@@ -9,8 +9,8 @@ Unless the user says otherwise, assume that you are assisting a student working 
 # Student profile
 
 * Prior knowledge: Basic Java and OOP concepts.
-* Level of programming experience: [to be filled]
-* IDE and level of expertise: [to be filled]
+* Level of programming experience:  Beginner/intermediate; comfortable with basic Java syntax, still learning larger project structure and Git workflow.
+* IDE and level of expertise: Some Intellij and VS code experience from previous course and projects, still learning more about IDE workflow
 
 # Guidance for interacting with users
 
