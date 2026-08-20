@@ -5,6 +5,6 @@ public class ToDos extends Task {
 
     @Override
     public String toString() {
-        return "[T]" + super.toString(); //adding extra task type identifier [T]
+        return "[T]" + super.toString();
     }
 }

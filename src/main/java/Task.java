@@ -1,5 +1,5 @@
 public class Task {
-    private String activity; //tasks that users need to finish
+    private String activity; //tasks that the user needs to finish
     private boolean status;  //whether it is done or not
 
     public Task(String activity) {
