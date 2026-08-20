@@ -1,7 +1,9 @@
+import java.util.Scanner;
+
 public class DisciTrack {
     public static void main(String[] args) {
         String line = "____________________________________________________________";
-        String banner = line + "\n"
+        String greeting = line + "\n"
                 + " ____    _             _   _____                 _       \n"
                 + "|  _ \\  (_) ___   ___ (_) |_   _| _ __   __ _  ___ | | __ \n"
                 + "| | | | | |/ __| / __|| |   | |  | '__| / _` |/ __|| |/ / \n"
@@ -11,10 +13,24 @@ public class DisciTrack {
                 + "Hello! I am DisciTrack.\n"
                 + "My job is to keep your discipline on track.\n"
                 + "How can I help you?\n"
-                + line + "\n"
-                + "Bye. Hope to see you again!\n"
-                + line;
+                + line + "\n";
 
-        System.out.println(banner);
+        System.out.println(greeting);
+
+        Scanner scanner = new Scanner(System.in); //to receive users input
+
+        while(true) {
+            String command = scanner.nextLine();
+            if(!command.equals("bye")) {
+                System.out.println(line);
+                System.out.println(command);
+                System.out.println(line);
+            } else {
+                System.out.println(line);
+                System.out.println("Bye bye! Well done today, keep it up! Hope to see you again soon!");
+                System.out.println(line);
+                break;
+            }
+        }
     }
 }
