@@ -56,10 +56,41 @@ public class DisciTrack {
                 System.out.println("I have marked this task as not done yet, try to finish soon!");
                 System.out.println(task);
                 System.out.println(line);
-            } else {
-                listOfTasks.add(new Task(command));
+            } else if (command.startsWith("todo ")) {
+                ToDos todo = new ToDos(command.substring(5));
+                listOfTasks.add(todo);
                 System.out.println(line);
-                System.out.println("I have added: " + command);
+                System.out.println("Alright! I have now added this task:");
+                System.out.println(todo);
+                System.out.println(String.format("Now you have %d tasks in the list", listOfTasks.size()));
+                System.out.println(line);
+            } else if (command.startsWith("deadline ")) {
+                String input = command.substring(9);
+                String[] parts = input.split(" /by ", 2);
+
+                String activity = parts[0];
+                String time = parts[1];
+                Deadlines deadline = new Deadlines(activity, time);
+                listOfTasks.add(deadline);
+                System.out.println(line);
+                System.out.println("Alright! I have now added this task:");
+                System.out.println(deadline);
+                System.out.println(String.format("Now you have %d tasks in the list", listOfTasks.size()));
+                System.out.println(line);
+            } else if (command.startsWith("event ")) {
+                String input = command.substring(6);
+                String[] fromSplit = input.split(" /from ", 2);
+                String activity = fromSplit[0];
+
+                String[] toSplit = fromSplit[1].split(" /to ", 2);
+                String from = toSplit[0];
+                String to = toSplit[1];
+                Events event  = new Events(activity, from, to);
+                listOfTasks.add(event);
+                System.out.println(line);
+                System.out.println("Alright! I have now added this task:");
+                System.out.println(event);
+                System.out.println(String.format("Now you have %d tasks in the list", listOfTasks.size()));
                 System.out.println(line);
             }
         }
