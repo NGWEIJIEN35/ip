@@ -37,8 +37,12 @@ public class DisciTrack {
                 } else if (command.equals("list")) {
                     System.out.println(line);
 
-                    for (int i = 0; i < listOfTasks.size(); i++) {
-                        System.out.println((i + 1) + ". " + listOfTasks.get(i));
+                    if(listOfTasks.isEmpty()) {
+                        System.out.println("Congratulations! You have no tasks currently!");
+                    } else {
+                        for (int i = 0; i < listOfTasks.size(); i++) {
+                            System.out.println((i + 1) + ". " + listOfTasks.get(i));
+                        }
                     }
 
                     System.out.println(line);
@@ -99,7 +103,7 @@ public class DisciTrack {
                 } else if (command.startsWith("delete")) {
                     String taskNumberString = command.substring(7);
                     int taskNumber = Integer.parseInt(taskNumberString);
-                    Task removedTask = listOfTasks.remove(taskNumber - 1);;
+                    Task removedTask = listOfTasks.remove(taskNumber - 1);
                     System.out.println(line);
                     System.out.println("Alright! I have deleted this task.");
                     System.out.println(removedTask);
@@ -116,7 +120,7 @@ public class DisciTrack {
     public static void handleCommand(String command) throws DisciTrackException {
         if (command.equals("bye") || command.equals("list")) {
             return;
-        } else if (command.startsWith("mark ") || command.startsWith("unmark ")) {
+        } else if (command.startsWith("mark ") || command.startsWith("unmark ") || command.startsWith("delete")) {
             return;
         } else if (command.startsWith("todo")) {   //handle empty cases for different tasks
             String activity = command.substring(4).trim();
