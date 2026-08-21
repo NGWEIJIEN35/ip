@@ -96,6 +96,14 @@ public class DisciTrack {
                     System.out.println(event);
                     System.out.println(String.format("Now you have %d tasks in the list.", listOfTasks.size()));
                     System.out.println(line);
+                } else if (command.startsWith("delete")) {
+                    String taskNumberString = command.substring(7);
+                    int taskNumber = Integer.parseInt(taskNumberString);
+                    Task removedTask = listOfTasks.remove(taskNumber - 1);;
+                    System.out.println(line);
+                    System.out.println("Alright! I have deleted this task.");
+                    System.out.println(removedTask);
+                    System.out.println(String.format("Now you have %d tasks in the list.", listOfTasks.size()));
                 }
             } catch (DisciTrackException e) {
                 System.out.println(line);
