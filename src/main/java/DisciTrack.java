@@ -27,14 +27,15 @@ public class DisciTrack {
             String command = scanner.nextLine();
 
             try {
-                handleCommand(command);
+                CommandType commandType = getCommandType(command);
+                handleCommand(command, commandType);
 
-                if (command.equals("bye")) {
+                if (commandType == CommandType.BYE) {
                     System.out.println(line);
                     System.out.println("Bye bye! Well done today, keep it up! Hope to see you again soon!");
                     System.out.println(line);
                     break;
-                } else if (command.equals("list")) {
+                } else if (commandType == CommandType.LIST) {
                     System.out.println(line);
 
                     if(listOfTasks.isEmpty()) {
@@ -46,7 +47,7 @@ public class DisciTrack {
                     }
 
                     System.out.println(line);
-                } else if (command.startsWith("mark ")) {  //assume users follow command's format, could modify in future
+                } else if  (commandType == CommandType.MARK){  //assume users follow command's format, could modify in future
                     String taskNumberString = command.substring(5);  //get the task user chose
                     int taskNumber = Integer.parseInt(taskNumberString);
                     Task task = listOfTasks.get(taskNumber - 1);
@@ -55,7 +56,7 @@ public class DisciTrack {
                     System.out.println("Well done, I have marked this task as done!");
                     System.out.println(task);
                     System.out.println(line);
-                } else if (command.startsWith("unmark ")) {
+                } else if (commandType == CommandType.UNMARK) {
                     String taskNumberString = command.substring(7);
                     int taskNumber = Integer.parseInt(taskNumberString);
                     Task task = listOfTasks.get(taskNumber - 1);
@@ -64,7 +65,7 @@ public class DisciTrack {
                     System.out.println("I have marked this task as not done yet, try to finish soon!");
                     System.out.println(task);
                     System.out.println(line);
-                } else if (command.startsWith("todo ")) {
+                } else if (commandType == CommandType.TODO)  {
                     ToDos todo = new ToDos(command.substring(5));
                     listOfTasks.add(todo);
                     System.out.println(line);
@@ -72,7 +73,7 @@ public class DisciTrack {
                     System.out.println(todo);
                     System.out.println(String.format("Now you have %d tasks in the list.", listOfTasks.size()));
                     System.out.println(line);
-                } else if (command.startsWith("deadline ")) {
+                } else if (commandType == CommandType.DEADLINE) {
                     String input = command.substring(9);
                     String[] parts = input.split(" /by ", 2);
 
@@ -85,7 +86,7 @@ public class DisciTrack {
                     System.out.println(deadline);
                     System.out.println(String.format("Now you have %d tasks in the list.", listOfTasks.size()));
                     System.out.println(line);
-                } else if (command.startsWith("event ")) {
+                } else if (commandType == CommandType.EVENT) {
                     String input = command.substring(6);
                     String[] fromSplit = input.split(" /from ", 2);
                     String activity = fromSplit[0];
@@ -100,7 +101,7 @@ public class DisciTrack {
                     System.out.println(event);
                     System.out.println(String.format("Now you have %d tasks in the list.", listOfTasks.size()));
                     System.out.println(line);
-                } else if (command.startsWith("delete")) {
+                } else if (commandType == CommandType.DELETE)  {
                     String taskNumberString = command.substring(7);
                     int taskNumber = Integer.parseInt(taskNumberString);
                     Task removedTask = listOfTasks.remove(taskNumber - 1);
@@ -117,18 +118,20 @@ public class DisciTrack {
         }
     }
 
-    public static void handleCommand(String command) throws DisciTrackException {
-        if (command.equals("bye") || command.equals("list")) {
+    public static void handleCommand(String command, CommandType commandType) throws DisciTrackException {
+        if (commandType == CommandType.BYE || commandType == CommandType.LIST) {
             return;
-        } else if (command.startsWith("mark ") || command.startsWith("unmark ") || command.startsWith("delete")) {
+        } else if (commandType == CommandType.MARK
+                || commandType == CommandType.UNMARK
+                || commandType == CommandType.DELETE) {
             return;
-        } else if (command.startsWith("todo")) {   //handle empty cases for different tasks
+        } else if (commandType == CommandType.TODO) {   //handle empty cases for different tasks
             String activity = command.substring(4).trim();
 
             if (activity.isEmpty()) {
                 throw new DisciTrackException("UHOH! The activity of a todo cannot be empty!");
             }
-        } else if (command.startsWith("deadline")) {
+        } else if (commandType == CommandType.DEADLINE) {
             String input = command.substring(8).trim();
             if (input.isEmpty()) {
                 throw new DisciTrackException("UHOH! The activity of a deadline cannot be empty!");
@@ -149,7 +152,7 @@ public class DisciTrack {
             if (time.isEmpty()) {
                 throw new DisciTrackException("UHOH! The time of a deadline cannot be empty!");
             }
-        } else if (command.startsWith("event")) {
+        } else if (commandType == CommandType.EVENT) {
             String input = command.substring(5).trim();
 
             if (input.isEmpty()) {
@@ -180,6 +183,30 @@ public class DisciTrack {
             }
         }  else {
             throw new DisciTrackException("UHOH, I didn't know what you mean.");  //handle unknown commands
+        }
+    }
+
+    public static CommandType getCommandType(String command) {
+        String commandWord = command.split(" ", 2)[0];
+
+        if (commandWord.equals("bye")) {
+            return CommandType.BYE;
+        } else if (commandWord.equals("list")) {
+            return CommandType.LIST;
+        } else if (commandWord.equals("mark")) {
+            return CommandType.MARK;
+        } else if (commandWord.equals("unmark")) {
+            return CommandType.UNMARK;
+        } else if (commandWord.equals("todo")) {
+            return CommandType.TODO;
+        } else if (commandWord.equals("deadline")) {
+            return CommandType.DEADLINE;
+        } else if (commandWord.equals("event")) {
+            return CommandType.EVENT;
+        } else if (commandWord.equals("delete")) {
+            return CommandType.DELETE;
+        } else {
+            return CommandType.UNKNOWN;
         }
     }
 }
