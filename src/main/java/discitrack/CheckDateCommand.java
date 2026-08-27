@@ -1,3 +1,5 @@
+package discitrack;
+
 import java.time.LocalDate;
 
 public class CheckDateCommand extends Command {
