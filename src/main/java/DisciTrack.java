@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-
+import java.io.FileNotFoundException;
 
 public class DisciTrack {
     public static void main(String[] args) {
@@ -26,6 +26,12 @@ public class DisciTrack {
         Scanner scanner = new Scanner(System.in); //to receive users input
 
         List<Task> listOfTasks = new ArrayList<>();
+
+        try {
+            listOfTasks = loadTasksFromData();
+        } catch (FileNotFoundException e) {
+            listOfTasks = new ArrayList<>();
+        }
 
         while (true) {
             String command = scanner.nextLine();
@@ -225,6 +231,7 @@ public class DisciTrack {
     }
 
     public static String taskToFileLine (Task task) {
+        //define 1 as done and 0 as not done in table
         String status = task.isDone() ? "1" : "0";
 
         if (task instanceof ToDos) {
@@ -254,5 +261,46 @@ public class DisciTrack {
         }
 
         writer.close();
+    }
+
+    public static List<Task> loadTasksFromData () throws FileNotFoundException {
+        List<Task> listOfTasks = new ArrayList<>();
+
+        File datafile = new File("data/discitrack.txt");
+
+        // Create the data folder on first run before writing the save file.
+        if(!datafile.exists()) {
+            return listOfTasks;
+        }
+
+        Scanner fileScanner = new Scanner(datafile);
+
+        while(fileScanner.hasNextLine()) {
+            String line = fileScanner.nextLine();
+            String[] parts = line.split(" \\| ");
+
+            String taskType = parts[0];
+            String status = parts[1];
+
+            Task task;
+
+            //add particular activity from data into list
+            if (taskType.equals("T")) {
+                task = new ToDos(parts[2]);
+            } else if (taskType.equals("D")) {
+                task = new Deadlines(parts[2], parts[3]);
+            } else {
+                task = new Events(parts[2], parts[3], parts[4]);
+            }
+
+            if (status.equals("1")) {
+                task.markAsDone();
+            }
+
+            listOfTasks.add(task);
+        }
+
+        fileScanner.close();
+        return listOfTasks;
     }
 }
