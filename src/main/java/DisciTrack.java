@@ -80,6 +80,34 @@ public class DisciTrack {
                     System.out.println("I have marked this task as not done yet, try to finish soon!");
                     System.out.println(task);
                     System.out.println(line);
+                } else if (commandType == CommandType.CHECKDATE) {
+                    String stringDate = command.substring(9).trim();
+                    LocalDate date = LocalDate.parse(stringDate);
+                    List<Task> tasksMatchedDate = new ArrayList<>();
+                    for(Task task : listOfTasks)  {
+                        if (task instanceof Deadlines) {
+                            if (((Deadlines) task).getTime().equals(date)) {
+                                tasksMatchedDate.add(task);
+                            }
+                        }
+
+                        if (task instanceof Events) {
+                            if (((Events) task).getFrom().equals(date) || ((Events) task).getTo().equals(date)) {
+                                tasksMatchedDate.add(task);
+                            }
+                        }
+                    }
+
+                    System.out.println(line);
+
+                    if (tasksMatchedDate.isEmpty()) {
+                        System.out.println("There is no tasks found on this date!");
+                    } else {
+                        for (Task task : tasksMatchedDate) {
+                            System.out.println(task);
+                        }
+                    }
+                    System.out.println(line);
                 } else if (commandType == CommandType.TODO)  {
                     ToDos todo = new ToDos(command.substring(5));
                     listOfTasks.add(todo);
@@ -150,7 +178,20 @@ public class DisciTrack {
                 || commandType == CommandType.UNMARK
                 || commandType == CommandType.DELETE) {
             return;
-        } else if (commandType == CommandType.TODO) {   //handle empty cases for different tasks
+        } else if (commandType == CommandType.CHECKDATE) {
+            String date = command.substring(9).trim();
+
+            if (date.isEmpty()) {
+                throw new DisciTrackException("UHOH! Please enter a date to check!");
+            }
+
+            // ensure date is in LocalDate format
+            try {
+                LocalDate.parse(date);
+            } catch (DateTimeParseException e) {
+                throw new DisciTrackException("UHOH! Please enter the check date in yyyy-MM-dd format!");
+            }
+        } else if (commandType == CommandType.TODO) {
             String activity = command.substring(4).trim();
 
             if (activity.isEmpty()) {
