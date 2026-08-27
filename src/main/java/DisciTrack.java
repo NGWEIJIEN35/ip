@@ -1,3 +1,4 @@
+import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 import java.util.List;
 import java.util.ArrayList;
@@ -5,6 +6,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.FileNotFoundException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class DisciTrack {
     public static void main(String[] args) {
@@ -91,7 +94,8 @@ public class DisciTrack {
                     String[] parts = input.split(" /by ", 2);
 
                     String activity = parts[0];
-                    String time = parts[1];
+                    // convert time in String type to LocalDate safely since checked in exceptions already
+                    LocalDate time = LocalDate.parse(parts[1].trim());
                     Deadlines deadline = new Deadlines(activity, time);
                     listOfTasks.add(deadline);
                     saveTasksToData(listOfTasks);
@@ -106,8 +110,9 @@ public class DisciTrack {
                     String activity = fromSplit[0];
 
                     String[] toSplit = fromSplit[1].split(" /to ", 2);
-                    String from = toSplit[0];
-                    String to = toSplit[1];
+                    // convert string type to Local Date type
+                    LocalDate from = LocalDate.parse(toSplit[0].trim());
+                    LocalDate to = LocalDate.parse(toSplit[1].trim());
                     Events event  = new Events(activity, from, to);
                     listOfTasks.add(event);
                     saveTasksToData(listOfTasks);
@@ -172,6 +177,14 @@ public class DisciTrack {
             if (time.isEmpty()) {
                 throw new DisciTrackException("UHOH! The time of a deadline cannot be empty!");
             }
+
+            //to check if date is inserted in correct format
+            try {
+                LocalDate.parse(time);
+            } catch (DateTimeParseException e) {
+                throw new DisciTrackException("UHOH! Please enter the deadline date in yyyy-MM-dd format!");
+            }
+
         } else if (commandType == CommandType.EVENT) {
             String input = command.substring(5).trim();
 
@@ -200,6 +213,13 @@ public class DisciTrack {
 
             if (to.isEmpty()) {
                 throw new DisciTrackException("UHOH! The end time of an event cannot be empty!");
+            }
+
+            try {
+                LocalDate.parse(from);
+                LocalDate.parse(to);
+            } catch (DateTimeParseException e) {
+                throw new DisciTrackException("UHOH! Please enter event dates in yyyy-MM-dd format!");
             }
         }  else {
             throw new DisciTrackException("UHOH, I didn't know what you mean.");  //handle unknown commands
@@ -288,9 +308,9 @@ public class DisciTrack {
             if (taskType.equals("T")) {
                 task = new ToDos(parts[2]);
             } else if (taskType.equals("D")) {
-                task = new Deadlines(parts[2], parts[3]);
+                task = new Deadlines(parts[2], LocalDate.parse(parts[3]));
             } else {
-                task = new Events(parts[2], parts[3], parts[4]);
+                task = new Events(parts[2], LocalDate.parse(parts[3]), LocalDate.parse(parts[4]));
             }
 
             if (status.equals("1")) {
