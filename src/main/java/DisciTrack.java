@@ -237,6 +237,8 @@ public class DisciTrack {
             return CommandType.MARK;
         } else if (commandWord.equals("unmark")) {
             return CommandType.UNMARK;
+        } else if (commandWord.equals("checkdate")) {
+            return CommandType.CHECKDATE;
         } else if (commandWord.equals("todo")) {
             return CommandType.TODO;
         } else if (commandWord.equals("deadline")) {
