@@ -1,5 +1,9 @@
-package discitrack;
+package discitrack.storage;
 
+import discitrack.task.Deadlines;
+import discitrack.task.Events;
+import discitrack.task.Task;
+import discitrack.task.ToDos;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;

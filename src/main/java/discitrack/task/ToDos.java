@@ -1,4 +1,4 @@
-package discitrack;
+package discitrack.task;
 
 public class ToDos extends Task {
     public ToDos(String task) {

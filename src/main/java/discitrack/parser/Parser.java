@@ -1,5 +1,17 @@
-package discitrack;
+package discitrack.parser;
 
+import discitrack.command.AddCommand;
+import discitrack.command.ByeCommand;
+import discitrack.command.CheckDateCommand;
+import discitrack.command.Command;
+import discitrack.command.DeleteCommand;
+import discitrack.command.ListCommand;
+import discitrack.command.MarkCommand;
+import discitrack.command.UnmarkCommand;
+import discitrack.exception.DisciTrackException;
+import discitrack.task.Deadlines;
+import discitrack.task.Events;
+import discitrack.task.ToDos;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 

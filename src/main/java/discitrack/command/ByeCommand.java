@@ -1,4 +1,8 @@
-package discitrack;
+package discitrack.command;
+
+import discitrack.storage.Storage;
+import discitrack.task.TaskList;
+import discitrack.ui.Ui;
 
 public class ByeCommand extends Command {
     @Override

@@ -1,5 +1,6 @@
-package discitrack;
+package discitrack.ui;
 
+import discitrack.task.Task;
 import java.util.List;
 import java.util.Scanner;
 

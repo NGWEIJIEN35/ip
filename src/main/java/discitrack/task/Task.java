@@ -1,4 +1,4 @@
-package discitrack;
+package discitrack.task;
 
 public class Task {
     private String activity; //tasks that the user needs to finish

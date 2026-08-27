@@ -1,5 +1,6 @@
-package discitrack;
+package discitrack.task;
 
+import discitrack.exception.DisciTrackException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
