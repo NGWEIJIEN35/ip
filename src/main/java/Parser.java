@@ -2,87 +2,51 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 
 public class Parser {
-    public static CommandType getCommandType(String command) {
-        String commandWord = command.split(" ", 2)[0];
+    public static Command parse(String fullCommand) throws DisciTrackException {
+        String commandWord = fullCommand.split(" ", 2)[0];
 
         if (commandWord.equals("bye")) {
-            return CommandType.BYE;
+            return new ByeCommand();
         } else if (commandWord.equals("list")) {
-            return CommandType.LIST;
+            return new ListCommand();
         } else if (commandWord.equals("mark")) {
-            return CommandType.MARK;
+            return new MarkCommand(parseTaskNumber(fullCommand, 5));
         } else if (commandWord.equals("unmark")) {
-            return CommandType.UNMARK;
+            return new UnmarkCommand(parseTaskNumber(fullCommand, 7));
         } else if (commandWord.equals("checkdate")) {
-            return CommandType.CHECKDATE;
+            return new CheckDateCommand(parseCheckDate(fullCommand));
         } else if (commandWord.equals("todo")) {
-            return CommandType.TODO;
+            return new AddCommand(parseTodo(fullCommand));
         } else if (commandWord.equals("deadline")) {
-            return CommandType.DEADLINE;
+            return new AddCommand(parseDeadline(fullCommand));
         } else if (commandWord.equals("event")) {
-            return CommandType.EVENT;
+            return new AddCommand(parseEvent(fullCommand));
         } else if (commandWord.equals("delete")) {
-            return CommandType.DELETE;
-        } else {
-            return CommandType.UNKNOWN;
-        }
-    }
-
-    public static void validateCommand(String command, CommandType commandType) throws DisciTrackException {
-        if (commandType == CommandType.BYE || commandType == CommandType.LIST) {
-            return;
-        } else if (commandType == CommandType.MARK
-                || commandType == CommandType.UNMARK
-                || commandType == CommandType.DELETE) {
-            return;
-        } else if (commandType == CommandType.CHECKDATE) {
-            validateCheckDate(command);
-        } else if (commandType == CommandType.TODO) {
-            validateTodo(command);
-        } else if (commandType == CommandType.DEADLINE) {
-            validateDeadline(command);
-        } else if (commandType == CommandType.EVENT) {
-            validateEvent(command);
+            return new DeleteCommand(parseTaskNumber(fullCommand, 7));
         } else {
             throw new DisciTrackException("UHOH, I didn't know what you mean.");
         }
     }
 
-    public static int getTaskNumber(String command, int commandWordLength) {
-        String taskNumberString = command.substring(commandWordLength);
-        return Integer.parseInt(taskNumberString);
+    private static int parseTaskNumber(String command, int commandWordLength) throws DisciTrackException {
+        String taskNumberString = "";
+
+        if (command.length() > commandWordLength) {
+            taskNumberString = command.substring(commandWordLength).trim();
+        }
+
+        if (taskNumberString.isEmpty()) {
+            throw new DisciTrackException("UHOH! Please enter a task number!");
+        }
+
+        try {
+            return Integer.parseInt(taskNumberString);
+        } catch (NumberFormatException e) {
+            throw new DisciTrackException("UHOH! Please enter a valid task number!");
+        }
     }
 
-    public static LocalDate parseCheckDate(String command) {
-        String stringDate = command.substring(9).trim();
-        return LocalDate.parse(stringDate);
-    }
-
-    public static ToDos parseTodo(String command) {
-        return new ToDos(command.substring(5));
-    }
-
-    public static Deadlines parseDeadline(String command) {
-        String input = command.substring(9);
-        String[] parts = input.split(" /by ", 2);
-
-        String activity = parts[0];
-        LocalDate time = LocalDate.parse(parts[1].trim());
-        return new Deadlines(activity, time);
-    }
-
-    public static Events parseEvent(String command) {
-        String input = command.substring(6);
-        String[] fromSplit = input.split(" /from ", 2);
-        String activity = fromSplit[0];
-
-        String[] toSplit = fromSplit[1].split(" /to ", 2);
-        LocalDate from = LocalDate.parse(toSplit[0].trim());
-        LocalDate to = LocalDate.parse(toSplit[1].trim());
-        return new Events(activity, from, to);
-    }
-
-    private static void validateCheckDate(String command) throws DisciTrackException {
+    private static LocalDate parseCheckDate(String command) throws DisciTrackException {
         String date = command.substring(9).trim();
 
         if (date.isEmpty()) {
@@ -90,21 +54,23 @@ public class Parser {
         }
 
         try {
-            LocalDate.parse(date);
+            return LocalDate.parse(date);
         } catch (DateTimeParseException e) {
             throw new DisciTrackException("UHOH! Please enter the check date in yyyy-MM-dd format!");
         }
     }
 
-    private static void validateTodo(String command) throws DisciTrackException {
+    private static ToDos parseTodo(String command) throws DisciTrackException {
         String activity = command.substring(4).trim();
 
         if (activity.isEmpty()) {
             throw new DisciTrackException("UHOH! The activity of a todo cannot be empty!");
         }
+
+        return new ToDos(command.substring(5));
     }
 
-    private static void validateDeadline(String command) throws DisciTrackException {
+    private static Deadlines parseDeadline(String command) throws DisciTrackException {
         String input = command.substring(8).trim();
 
         if (input.isEmpty()) {
@@ -128,13 +94,13 @@ public class Parser {
         }
 
         try {
-            LocalDate.parse(time);
+            return new Deadlines(activity, LocalDate.parse(time));
         } catch (DateTimeParseException e) {
             throw new DisciTrackException("UHOH! Please enter the deadline date in yyyy-MM-dd format!");
         }
     }
 
-    private static void validateEvent(String command) throws DisciTrackException {
+    private static Events parseEvent(String command) throws DisciTrackException {
         String input = command.substring(5).trim();
 
         if (input.isEmpty()) {
@@ -165,8 +131,7 @@ public class Parser {
         }
 
         try {
-            LocalDate.parse(from);
-            LocalDate.parse(to);
+            return new Events(activity, LocalDate.parse(from), LocalDate.parse(to));
         } catch (DateTimeParseException e) {
             throw new DisciTrackException("UHOH! Please enter event dates in yyyy-MM-dd format!");
         }

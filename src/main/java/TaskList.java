@@ -17,11 +17,13 @@ public class TaskList {
         tasks.add(task);
     }
 
-    public Task get(int taskNumber) {
+    public Task get(int taskNumber) throws DisciTrackException {
+        validateTaskNumber(taskNumber);
         return tasks.get(taskNumber - 1);
     }
 
-    public Task delete(int taskNumber) {
+    public Task delete(int taskNumber) throws DisciTrackException {
+        validateTaskNumber(taskNumber);
         return tasks.remove(taskNumber - 1);
     }
 
@@ -50,5 +52,11 @@ public class TaskList {
         }
 
         return tasksMatchedDate;
+    }
+
+    private void validateTaskNumber(int taskNumber) throws DisciTrackException {
+        if (taskNumber < 1 || taskNumber > tasks.size()) {
+            throw new DisciTrackException("UHOH! Please enter a valid task number!");
+        }
     }
 }
