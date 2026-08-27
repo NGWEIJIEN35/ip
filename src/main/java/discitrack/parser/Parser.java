@@ -17,26 +17,27 @@ import java.time.format.DateTimeParseException;
 
 public class Parser {
     public static Command parse(String fullCommand) throws DisciTrackException {
-        String commandWord = fullCommand.split(" ", 2)[0];
+        String command = fullCommand.trim();
+        String commandWord = command.split(" ", 2)[0];
 
         if (commandWord.equals("bye")) {
             return new ByeCommand();
         } else if (commandWord.equals("list")) {
             return new ListCommand();
         } else if (commandWord.equals("mark")) {
-            return new MarkCommand(parseTaskNumber(fullCommand, 5));
+            return new MarkCommand(parseTaskNumber(command, 5));
         } else if (commandWord.equals("unmark")) {
-            return new UnmarkCommand(parseTaskNumber(fullCommand, 7));
+            return new UnmarkCommand(parseTaskNumber(command, 7));
         } else if (commandWord.equals("checkdate")) {
-            return new CheckDateCommand(parseCheckDate(fullCommand));
+            return new CheckDateCommand(parseCheckDate(command));
         } else if (commandWord.equals("todo")) {
-            return new AddCommand(parseTodo(fullCommand));
+            return new AddCommand(parseTodo(command));
         } else if (commandWord.equals("deadline")) {
-            return new AddCommand(parseDeadline(fullCommand));
+            return new AddCommand(parseDeadline(command));
         } else if (commandWord.equals("event")) {
-            return new AddCommand(parseEvent(fullCommand));
+            return new AddCommand(parseEvent(command));
         } else if (commandWord.equals("delete")) {
-            return new DeleteCommand(parseTaskNumber(fullCommand, 7));
+            return new DeleteCommand(parseTaskNumber(command, 7));
         } else {
             throw new DisciTrackException("UHOH, I didn't know what you mean.");
         }
@@ -81,7 +82,7 @@ public class Parser {
             throw new DisciTrackException("UHOH! The activity of a todo cannot be empty!");
         }
 
-        return new ToDos(command.substring(5));
+        return new ToDos(activity);
     }
 
     private static Deadlines parseDeadline(String command) throws DisciTrackException {
@@ -91,11 +92,12 @@ public class Parser {
             throw new DisciTrackException("UHOH! The activity of a deadline cannot be empty!");
         }
 
-        if (!input.contains(" /by ")) {
+        String[] parts = input.split("\\s+/by\\s+", 2);
+
+        if (parts.length < 2) {
             throw new DisciTrackException("UHOH! A deadline needs a /by time!");
         }
 
-        String[] parts = input.split(" /by ", 2);
         String activity = parts[0].trim();
         String time = parts[1].trim();
 
@@ -121,14 +123,20 @@ public class Parser {
             throw new DisciTrackException("UHOH! The activity of an event cannot be empty!");
         }
 
-        if (!input.contains(" /from ") || !input.contains(" /to ")) {
+        String[] fromSplit = input.split("\\s+/from\\s+", 2);
+
+        if (fromSplit.length < 2) {
             throw new DisciTrackException("UHOH! An event needs both /from and /to!");
         }
 
-        String[] fromSplit = input.split(" /from ", 2);
         String activity = fromSplit[0].trim();
 
-        String[] toSplit = fromSplit[1].split(" /to ", 2);
+        String[] toSplit = fromSplit[1].split("\\s+/to\\s+", 2);
+
+        if (toSplit.length < 2) {
+            throw new DisciTrackException("UHOH! An event needs both /from and /to!");
+        }
+
         String from = toSplit[0].trim();
         String to = toSplit[1].trim();
 
