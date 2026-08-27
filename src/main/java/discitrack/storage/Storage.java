@@ -13,13 +13,27 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * Handles loading tasks from disk and saving tasks back to disk.
+ */
 public class Storage {
     private final String filePath;
 
+    /**
+     * Creates a storage manager for the given file path.
+     *
+     * @param filePath path to the task data file
+     */
     public Storage(String filePath) {
         this.filePath = filePath;
     }
 
+    /**
+     * Saves the given tasks to the configured data file.
+     *
+     * @param tasks the tasks to save
+     * @throws IOException if the file cannot be written
+     */
     public void save(List<Task> tasks) throws IOException {
         File dataFile = new File(filePath);
         File dataFolder = dataFile.getParentFile();
@@ -37,6 +51,12 @@ public class Storage {
         writer.close();
     }
 
+    /**
+     * Loads tasks from the configured data file.
+     *
+     * @return the tasks stored in the data file, or an empty list if the file does not exist
+     * @throws FileNotFoundException if the file cannot be opened for reading
+     */
     public List<Task> load() throws FileNotFoundException {
         List<Task> tasks = new ArrayList<>();
         File dataFile = new File(filePath);
@@ -75,6 +95,12 @@ public class Storage {
         return tasks;
     }
 
+    /**
+     * Converts a task into the text format used in the data file.
+     *
+     * @param task the task to convert
+     * @return the file line representing the task
+     */
     private String taskToFileLine(Task task) {
         String status = task.isDone() ? "1" : "0";
 
