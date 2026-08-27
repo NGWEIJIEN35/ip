@@ -3,6 +3,7 @@ public enum CommandType {
     LIST,
     MARK,
     UNMARK,
+    CHECKDATE,
     TODO,
     DEADLINE,
     EVENT,
