@@ -1,6 +1,10 @@
 import java.util.Scanner;
 import java.util.List;
 import java.util.ArrayList;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
 
 public class DisciTrack {
     public static void main(String[] args) {
@@ -52,6 +56,7 @@ public class DisciTrack {
                     int taskNumber = Integer.parseInt(taskNumberString);
                     Task task = listOfTasks.get(taskNumber - 1);
                     task.markAsDone();
+                    saveTasksToData(listOfTasks);
                     System.out.println(line);
                     System.out.println("Well done, I have marked this task as done!");
                     System.out.println(task);
@@ -61,6 +66,7 @@ public class DisciTrack {
                     int taskNumber = Integer.parseInt(taskNumberString);
                     Task task = listOfTasks.get(taskNumber - 1);
                     task.markAsUndone();
+                    saveTasksToData(listOfTasks);
                     System.out.println(line);
                     System.out.println("I have marked this task as not done yet, try to finish soon!");
                     System.out.println(task);
@@ -68,6 +74,7 @@ public class DisciTrack {
                 } else if (commandType == CommandType.TODO)  {
                     ToDos todo = new ToDos(command.substring(5));
                     listOfTasks.add(todo);
+                    saveTasksToData(listOfTasks);
                     System.out.println(line);
                     System.out.println("Alright! I have added this task:");
                     System.out.println(todo);
@@ -81,6 +88,7 @@ public class DisciTrack {
                     String time = parts[1];
                     Deadlines deadline = new Deadlines(activity, time);
                     listOfTasks.add(deadline);
+                    saveTasksToData(listOfTasks);
                     System.out.println(line);
                     System.out.println("Alright! I have added this task:");
                     System.out.println(deadline);
@@ -96,6 +104,7 @@ public class DisciTrack {
                     String to = toSplit[1];
                     Events event  = new Events(activity, from, to);
                     listOfTasks.add(event);
+                    saveTasksToData(listOfTasks);
                     System.out.println(line);
                     System.out.println("Alright! I have added this task:");
                     System.out.println(event);
@@ -105,6 +114,7 @@ public class DisciTrack {
                     String taskNumberString = command.substring(7);
                     int taskNumber = Integer.parseInt(taskNumberString);
                     Task removedTask = listOfTasks.remove(taskNumber - 1);
+                    saveTasksToData(listOfTasks);
                     System.out.println(line);
                     System.out.println("Alright! I have deleted this task.");
                     System.out.println(removedTask);
@@ -113,6 +123,10 @@ public class DisciTrack {
             } catch (DisciTrackException e) {
                 System.out.println(line);
                 System.out.println(e.getMessage());
+                System.out.println(line);
+            } catch (IOException e) {
+                System.out.println(line);
+                System.out.println("UHOH! I could not save your tasks.");
                 System.out.println(line);
             }
         }
@@ -208,5 +222,37 @@ public class DisciTrack {
         } else {
             return CommandType.UNKNOWN;
         }
+    }
+
+    public static String taskToFileLine (Task task) {
+        String status = task.isDone() ? "1" : "0";
+
+        if (task instanceof ToDos) {
+            return "T | " + status + " | " + task.getActivity();
+        } else if (task instanceof Deadlines) {
+            Deadlines deadline = (Deadlines) task;
+            return "D | " + status + " | " + deadline.getActivity() + " | " + deadline.getTime();
+        } else if (task instanceof Events) {
+            Events event = (Events) task;
+            return "E | " + status + " | " + event.getActivity() + " | " + event.getFrom() + " | " + event.getTo();
+        }
+
+        return "";
+    }
+
+    public static void saveTasksToData (List<Task> listOfTasks) throws IOException {
+        File dataFolder = new File("data");
+
+        if (!dataFolder.exists()) {
+            dataFolder.mkdir();
+        }
+
+        FileWriter writer = new FileWriter("data/discitrack.txt");
+
+        for (Task task : listOfTasks) {
+            writer.write(taskToFileLine(task) + System.lineSeparator());
+        }
+
+        writer.close();
     }
 }

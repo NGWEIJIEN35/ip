@@ -7,6 +7,13 @@ public class Task {
         this.status = false;
     }
 
+    public String getActivity() {
+        return this.activity;
+    }
+
+    public boolean isDone() {
+        return this.status;
+    }
     public void markAsDone() {
         this.status = true;
     }
