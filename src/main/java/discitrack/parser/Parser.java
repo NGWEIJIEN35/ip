@@ -5,6 +5,7 @@ import discitrack.command.ByeCommand;
 import discitrack.command.CheckDateCommand;
 import discitrack.command.Command;
 import discitrack.command.DeleteCommand;
+import discitrack.command.FindCommand;
 import discitrack.command.ListCommand;
 import discitrack.command.MarkCommand;
 import discitrack.command.UnmarkCommand;
@@ -40,6 +41,8 @@ public class Parser {
             return new UnmarkCommand(parseTaskNumber(command, 7));
         } else if (commandWord.equals("checkdate")) {
             return new CheckDateCommand(parseCheckDate(command));
+        } else if (commandWord.equals("find")) {
+            return new FindCommand(parseFindKeyword(command));
         } else if (commandWord.equals("todo")) {
             return new AddCommand(parseTodo(command));
         } else if (commandWord.equals("deadline")) {
@@ -98,6 +101,23 @@ public class Parser {
         } catch (DateTimeParseException e) {
             throw new DisciTrackException("UHOH! Please enter the check date in yyyy-MM-dd format!");
         }
+    }
+
+    /**
+     * Parses the keyword supplied to a find command.
+     *
+     * @param command the full find command.
+     * @return the keyword to search for.
+     * @throws DisciTrackException if the keyword is empty.
+     */
+    private static String parseFindKeyword(String command) throws DisciTrackException {
+        String keyword = command.substring(4).trim();
+
+        if (keyword.isEmpty()) {
+            throw new DisciTrackException("UHOH! Please enter a keyword to find!");
+        }
+
+        return keyword;
     }
 
     /**
