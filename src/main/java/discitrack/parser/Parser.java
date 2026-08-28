@@ -22,9 +22,9 @@ public class Parser {
     /**
      * Parses the full user command into the corresponding command object.
      *
-     * @param fullCommand the full command entered by the user
-     * @return the command represented by the user input
-     * @throws DisciTrackException if the command is unknown or has an invalid format
+     * @param fullCommand the full command entered by the user.
+     * @return the command represented by the user input.
+     * @throws DisciTrackException if the command is unknown or has an invalid format.
      */
     public static Command parse(String fullCommand) throws DisciTrackException {
         String command = fullCommand.trim();
@@ -56,10 +56,10 @@ public class Parser {
     /**
      * Parses the task number after a command word.
      *
-     * @param command the full command entered by the user
-     * @param commandWordLength the length of the command word before the task number
-     * @return the one-based task number entered by the user
-     * @throws DisciTrackException if the task number is missing or invalid
+     * @param command the full command entered by the user.
+     * @param commandWordLength the length of the command word before the task number.
+     * @return the one-based task number entered by the user.
+     * @throws DisciTrackException if the task number is missing or invalid.
      */
     private static int parseTaskNumber(String command, int commandWordLength) throws DisciTrackException {
         String taskNumberString = "";
@@ -82,9 +82,9 @@ public class Parser {
     /**
      * Parses the date supplied to a checkdate command.
      *
-     * @param command the full checkdate command
-     * @return the date to check
-     * @throws DisciTrackException if the date is missing or not in yyyy-MM-dd format
+     * @param command the full checkdate command.
+     * @return the date to check.
+     * @throws DisciTrackException if the date is missing or not in yyyy-MM-dd format.
      */
     private static LocalDate parseCheckDate(String command) throws DisciTrackException {
         String date = command.substring(9).trim();
@@ -103,9 +103,9 @@ public class Parser {
     /**
      * Parses a todo command into a todo task.
      *
-     * @param command the full todo command
-     * @return the todo task described by the command
-     * @throws DisciTrackException if the todo activity is empty
+     * @param command the full todo command.
+     * @return the todo task described by the command.
+     * @throws DisciTrackException if the todo activity is empty.
      */
     private static ToDos parseTodo(String command) throws DisciTrackException {
         String activity = command.substring(4).trim();
@@ -120,9 +120,9 @@ public class Parser {
     /**
      * Parses a deadline command into a deadline task.
      *
-     * @param command the full deadline command
-     * @return the deadline task described by the command
-     * @throws DisciTrackException if the activity, /by keyword, or date is invalid
+     * @param command the full deadline command.
+     * @return the deadline task described by the command.
+     * @throws DisciTrackException if the activity, /by keyword, or date is invalid.
      */
     private static Deadlines parseDeadline(String command) throws DisciTrackException {
         String input = command.substring(8).trim();
@@ -158,9 +158,9 @@ public class Parser {
     /**
      * Parses an event command into an event task.
      *
-     * @param command the full event command
-     * @return the event task described by the command
-     * @throws DisciTrackException if the activity, /from keyword, /to keyword, or dates are invalid
+     * @param command the full event command.
+     * @return the event task described by the command.
+     * @throws DisciTrackException if the activity, /from keyword, /to keyword, or dates are invalid.
      */
     private static Events parseEvent(String command) throws DisciTrackException {
         String input = command.substring(5).trim();

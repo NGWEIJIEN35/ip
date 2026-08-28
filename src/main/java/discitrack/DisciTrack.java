@@ -24,7 +24,7 @@ public class DisciTrack {
     /**
      * Creates a DisciTrack application that stores tasks at the given file path.
      *
-     * @param filePath path to the file used for saving and loading tasks
+     * @param filePath path to the file used for saving and loading tasks.
      */
     public DisciTrack(String filePath) {
         ui = new Ui();
@@ -35,7 +35,7 @@ public class DisciTrack {
     /**
      * Starts the DisciTrack application.
      *
-     * @param args command line arguments supplied to the program
+     * @param args command line arguments supplied to the program.
      */
     public static void main(String[] args) {
         new DisciTrack(FILE_PATH).run();
@@ -68,7 +68,7 @@ public class DisciTrack {
     /**
      * Loads the saved tasks, or starts with an empty list if the data file does not exist.
      *
-     * @return the tasks loaded from storage
+     * @return the tasks loaded from storage.
      */
     private ArrayList<Task> loadTasks() {
         try {

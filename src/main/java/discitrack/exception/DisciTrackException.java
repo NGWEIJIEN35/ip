@@ -7,7 +7,7 @@ public class DisciTrackException extends Exception {
     /**
      * Creates a DisciTrack exception with a user-facing message.
      *
-     * @param message the message explaining the error
+     * @param message the message explaining the error.
      */
     public DisciTrackException(String message) {
         super(message);

@@ -13,9 +13,9 @@ public class Events extends Task {
     /**
      * Creates an event task with the given activity and date range.
      *
-     * @param activity the activity represented by the event
-     * @param from the start date of the event
-     * @param to the end date of the event
+     * @param activity the activity represented by the event.
+     * @param from the start date of the event.
+     * @param to the end date of the event.
      */
     public Events(String activity, LocalDate from, LocalDate to) {
         super(activity);
@@ -26,7 +26,7 @@ public class Events extends Task {
     /**
      * Returns the start date of this event.
      *
-     * @return the start date
+     * @return the start date.
      */
     public LocalDate getFrom() {
         return this.from;
@@ -35,17 +35,18 @@ public class Events extends Task {
     /**
      * Returns the end date of this event.
      *
-     * @return the end date
+     * @return the end date.
      */
     public LocalDate getTo() {
         return this.to;
     }
-    @Override
+
     /**
      * Returns the display text for this event task.
      *
-     * @return the event task formatted for display
+     * @return the event task formatted for display.
      */
+    @Override
     public String toString() {
         String stringFrom = DateTimeFormatter.ofPattern("MMM dd yyyy").format(from);
         String stringTo = DateTimeFormatter.ofPattern("MMM dd yyyy").format(to);

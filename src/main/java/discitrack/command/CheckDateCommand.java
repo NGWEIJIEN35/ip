@@ -14,20 +14,20 @@ public class CheckDateCommand extends Command {
     /**
      * Creates a checkdate command for the given date.
      *
-     * @param date the date to check tasks against
+     * @param date the date to check tasks against.
      */
     public CheckDateCommand(LocalDate date) {
         this.date = date;
     }
 
-    @Override
     /**
      * Displays the tasks that match this command's date.
      *
-     * @param tasks the task list to search
-     * @param ui the UI used to show matching tasks
-     * @param storage the storage used by the application
+     * @param tasks the task list to search.
+     * @param ui the UI used to show matching tasks.
+     * @param storage the storage used by the application.
      */
+    @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) {
         ui.showDateMatches(tasks.findTasksByDate(date));
     }

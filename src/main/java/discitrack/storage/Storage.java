@@ -22,7 +22,7 @@ public class Storage {
     /**
      * Creates a storage manager for the given file path.
      *
-     * @param filePath path to the task data file
+     * @param filePath path to the task data file.
      */
     public Storage(String filePath) {
         this.filePath = filePath;
@@ -31,8 +31,8 @@ public class Storage {
     /**
      * Saves the given tasks to the configured data file.
      *
-     * @param tasks the tasks to save
-     * @throws IOException if the file cannot be written
+     * @param tasks the tasks to save.
+     * @throws IOException if the file cannot be written.
      */
     public void save(List<Task> tasks) throws IOException {
         File dataFile = new File(filePath);
@@ -54,8 +54,8 @@ public class Storage {
     /**
      * Loads tasks from the configured data file.
      *
-     * @return the tasks stored in the data file, or an empty list if the file does not exist
-     * @throws FileNotFoundException if the file cannot be opened for reading
+     * @return the tasks stored in the data file, or an empty list if the file does not exist.
+     * @throws FileNotFoundException if the file cannot be opened for reading.
      */
     public List<Task> load() throws FileNotFoundException {
         List<Task> tasks = new ArrayList<>();
@@ -98,8 +98,8 @@ public class Storage {
     /**
      * Converts a task into the text format used in the data file.
      *
-     * @param task the task to convert
-     * @return the file line representing the task
+     * @param task the task to convert.
+     * @return the file line representing the task.
      */
     private String taskToFileLine(Task task) {
         String status = task.isDone() ? "1" : "0";

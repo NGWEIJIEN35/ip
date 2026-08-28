@@ -41,7 +41,7 @@ public class Ui {
     /**
      * Reads the next command entered by the user.
      *
-     * @return the command entered by the user
+     * @return the command entered by the user.
      */
     public String readCommand() {
         return scanner.nextLine();
@@ -59,7 +59,7 @@ public class Ui {
     /**
      * Displays all tasks in the task list.
      *
-     * @param tasks the tasks to display
+     * @param tasks the tasks to display.
      */
     public void showTaskList(List<Task> tasks) {
         showLine();
@@ -78,7 +78,7 @@ public class Ui {
     /**
      * Displays a message for a task that has been marked as done.
      *
-     * @param task the task that was marked
+     * @param task the task that was marked.
      */
     public void showTaskMarked(Task task) {
         showLine();
@@ -90,7 +90,7 @@ public class Ui {
     /**
      * Displays a message for a task that has been marked as not done.
      *
-     * @param task the task that was unmarked
+     * @param task the task that was unmarked.
      */
     public void showTaskUnmarked(Task task) {
         showLine();
@@ -102,7 +102,7 @@ public class Ui {
     /**
      * Displays tasks that match a searched date.
      *
-     * @param tasksMatchedDate tasks that match the searched date
+     * @param tasksMatchedDate tasks that match the searched date.
      */
     public void showDateMatches(List<Task> tasksMatchedDate) {
         showLine();
@@ -121,8 +121,8 @@ public class Ui {
     /**
      * Displays a message for a newly added task.
      *
-     * @param task the task that was added
-     * @param taskCount the number of tasks after adding the task
+     * @param task the task that was added.
+     * @param taskCount the number of tasks after adding the task.
      */
     public void showTaskAdded(Task task, int taskCount) {
         showLine();
@@ -135,8 +135,8 @@ public class Ui {
     /**
      * Displays a message for a deleted task.
      *
-     * @param removedTask the task that was deleted
-     * @param taskCount the number of tasks after deleting the task
+     * @param removedTask the task that was deleted.
+     * @param taskCount the number of tasks after deleting the task.
      */
     public void showTaskDeleted(Task removedTask, int taskCount) {
         showLine();
@@ -148,7 +148,7 @@ public class Ui {
     /**
      * Displays an error message.
      *
-     * @param message the error message to display
+     * @param message the error message to display.
      */
     public void showError(String message) {
         showLine();
