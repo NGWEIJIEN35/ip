@@ -1,6 +1,7 @@
 package discitrack.parser;
 
 import discitrack.command.Command;
+import discitrack.command.FindCommand;
 import discitrack.exception.DisciTrackException;
 import discitrack.storage.Storage;
 import discitrack.task.Deadlines;
@@ -55,6 +56,18 @@ public class ParserTest {
     @Test
     public void parse_deadlineWithoutBy_throwsDisciTrackException() {
         assertThrows(DisciTrackException.class, () -> Parser.parse("deadline homework 2026-08-29"));
+    }
+
+    @Test
+    public void parse_findWithKeyword_returnsFindCommand() throws DisciTrackException {
+        Command command = Parser.parse("find book");
+
+        assertInstanceOf(FindCommand.class, command);
+    }
+
+    @Test
+    public void parse_findWithoutKeyword_throwsDisciTrackException() {
+        assertThrows(DisciTrackException.class, () -> Parser.parse("find     "));
     }
 
     @Test

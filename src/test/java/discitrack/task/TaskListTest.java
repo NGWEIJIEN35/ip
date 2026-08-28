@@ -46,4 +46,40 @@ public class TaskListTest {
 
         assertEquals(0, tasksOnDate.size());
     }
+
+    @Test
+    public void findTasksByKeyword_matchingKeyword_returnsMatchingTasks() {
+        TaskList tasks = new TaskList();
+        tasks.add(new ToDos("read book"));
+        tasks.add(new Deadlines("return book", LocalDate.parse("2026-08-29")));
+        tasks.add(new Events("camp", LocalDate.parse("2026-09-01"), LocalDate.parse("2026-09-03")));
+
+        List<Task> matchingTasks = tasks.findTasksByKeyword("book");
+
+        assertEquals(2, matchingTasks.size());
+        assertEquals("read book", matchingTasks.get(0).getActivity());
+        assertEquals("return book", matchingTasks.get(1).getActivity());
+    }
+
+    @Test
+    public void findTasksByKeyword_differentCase_returnsMatchingTasks() {
+        TaskList tasks = new TaskList();
+        tasks.add(new ToDos("Read Book"));
+
+        List<Task> matchingTasks = tasks.findTasksByKeyword("book");
+
+        assertEquals(1, matchingTasks.size());
+        assertEquals("Read Book", matchingTasks.get(0).getActivity());
+    }
+
+    @Test
+    public void findTasksByKeyword_noMatchingKeyword_returnsEmptyList() {
+        TaskList tasks = new TaskList();
+        tasks.add(new ToDos("read book"));
+        tasks.add(new Deadlines("submit homework", LocalDate.parse("2026-08-29")));
+
+        List<Task> matchingTasks = tasks.findTasksByKeyword("lecture");
+
+        assertEquals(0, matchingTasks.size());
+    }
 }
