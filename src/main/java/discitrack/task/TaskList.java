@@ -104,6 +104,25 @@ public class TaskList {
     }
 
     /**
+     * Finds tasks whose activity descriptions contain the given keyword.
+     *
+     * @param keyword the keyword to search for.
+     * @return tasks whose activity descriptions contain the keyword.
+     */
+    public List<Task> findTasksByKeyword(String keyword) {
+        List<Task> matchingTasks = new ArrayList<>();
+        String keywordToFind = keyword.toLowerCase();
+
+        for (Task task : tasks) {
+            if (task.getActivity().toLowerCase().contains(keywordToFind)) {
+                matchingTasks.add(task);
+            }
+        }
+
+        return matchingTasks;
+    }
+
+    /**
      * Checks that a one-based task number refers to an existing task.
      *
      * @param taskNumber the task number to validate.
