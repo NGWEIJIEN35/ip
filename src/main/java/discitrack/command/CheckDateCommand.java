@@ -1,9 +1,10 @@
 package discitrack.command;
 
+import java.time.LocalDate;
+
 import discitrack.storage.Storage;
 import discitrack.task.TaskList;
 import discitrack.ui.Ui;
-import java.time.LocalDate;
 
 /**
  * Shows tasks that are relevant to a specific date.

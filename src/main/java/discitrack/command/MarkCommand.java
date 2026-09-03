@@ -1,11 +1,12 @@
 package discitrack.command;
 
+import java.io.IOException;
+
 import discitrack.exception.DisciTrackException;
 import discitrack.storage.Storage;
 import discitrack.task.Task;
 import discitrack.task.TaskList;
 import discitrack.ui.Ui;
-import java.io.IOException;
 
 /**
  * Marks an existing task as done.

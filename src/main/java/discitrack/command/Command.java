@@ -1,10 +1,11 @@
 package discitrack.command;
 
+import java.io.IOException;
+
 import discitrack.exception.DisciTrackException;
 import discitrack.storage.Storage;
 import discitrack.task.TaskList;
 import discitrack.ui.Ui;
-import java.io.IOException;
 
 /**
  * Represents a user command that can be executed by DisciTrack.

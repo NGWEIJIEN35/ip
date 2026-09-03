@@ -1,9 +1,5 @@
 package discitrack.storage;
 
-import discitrack.task.Deadlines;
-import discitrack.task.Events;
-import discitrack.task.Task;
-import discitrack.task.ToDos;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
@@ -12,6 +8,11 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+
+import discitrack.task.Deadlines;
+import discitrack.task.Events;
+import discitrack.task.Task;
+import discitrack.task.ToDos;
 
 /**
  * Handles loading tasks from disk and saving tasks back to disk.

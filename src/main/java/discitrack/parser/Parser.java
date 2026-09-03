@@ -1,5 +1,8 @@
 package discitrack.parser;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+
 import discitrack.command.AddCommand;
 import discitrack.command.ByeCommand;
 import discitrack.command.CheckDateCommand;
@@ -13,8 +16,6 @@ import discitrack.exception.DisciTrackException;
 import discitrack.task.Deadlines;
 import discitrack.task.Events;
 import discitrack.task.ToDos;
-import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 
 /**
  * Parses user input into executable commands.

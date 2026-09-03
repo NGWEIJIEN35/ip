@@ -1,9 +1,10 @@
 package discitrack.task;
 
-import discitrack.exception.DisciTrackException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+
+import discitrack.exception.DisciTrackException;
 
 /**
  * Stores the user's tasks and provides operations on the task list.

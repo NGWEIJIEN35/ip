@@ -1,5 +1,16 @@
 package discitrack.parser;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.time.LocalDate;
+
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
 import discitrack.command.Command;
 import discitrack.command.FindCommand;
 import discitrack.exception.DisciTrackException;
@@ -9,16 +20,6 @@ import discitrack.task.Task;
 import discitrack.task.TaskList;
 import discitrack.task.ToDos;
 import discitrack.ui.Ui;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.time.LocalDate;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ParserTest {
     @TempDir

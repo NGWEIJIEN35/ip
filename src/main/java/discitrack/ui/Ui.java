@@ -1,8 +1,9 @@
 package discitrack.ui;
 
-import discitrack.task.Task;
 import java.util.List;
 import java.util.Scanner;
+
+import discitrack.task.Task;
 
 /**
  * Handles all interactions between DisciTrack and the user.
