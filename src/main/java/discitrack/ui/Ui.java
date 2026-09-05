@@ -118,9 +118,12 @@ public class Ui {
      * @param task the task that was marked.
      */
     public void showTaskMarked(Task task) {
-        showResponse("Well done! You completed:\n\n"
-                + task + "\n\n"
-                + "Keep the momentum going! You can do it!");
+        showResponse(
+                "Well done! You completed:",
+                "",
+                task.toString(),
+                "",
+                "Keep the momentum going! You can do it!");
     }
 
     /**
@@ -129,7 +132,9 @@ public class Ui {
      * @param task the task that was unmarked.
      */
     public void showTaskUnmarked(Task task) {
-        showResponse("I have marked this task as not done yet, try to finish soon!\n" + task);
+        showResponse(
+                "I have marked this task as not done yet, try to finish soon!",
+                task.toString());
     }
 
     /**
@@ -177,10 +182,13 @@ public class Ui {
      */
     public void showTaskAdded(Task task, int taskCount) {
         String taskWord = taskCount == 1 ? "task" : "tasks";
-        showResponse("Alright! I've added this task:\n\n"
-                + task + "\n"
-                + String.format("You now have %d %s.\n\n", taskCount, taskWord)
-                + "Lock in! Try to finish as soon as possible!");
+        showResponse(
+                "Alright! I've added this task:",
+                "",
+                task.toString(),
+                String.format("You now have %d %s.", taskCount, taskWord),
+                "",
+                "Lock in! Try to finish as soon as possible!");
     }
 
     /**
@@ -190,9 +198,10 @@ public class Ui {
      * @param taskCount the number of tasks after deleting the task.
      */
     public void showTaskDeleted(Task removedTask, int taskCount) {
-        showResponse("Alright! I have deleted this task.\n"
-                + removedTask + "\n"
-                + String.format("Now you have %d tasks in the list.", taskCount));
+        showResponse(
+                "Alright! I have deleted this task.",
+                removedTask.toString(),
+                String.format("Now you have %d tasks in the list.", taskCount));
     }
 
     /**
@@ -229,7 +238,8 @@ public class Ui {
         return GREETING;
     }
 
-    private void showResponse(String response) {
+    private void showResponse(String... responseLines) {
+        String response = String.join(System.lineSeparator(), responseLines);
         lastResponse = response;
         if (shouldPrintResponses) {
             showLine();
