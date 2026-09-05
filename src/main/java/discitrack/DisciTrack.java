@@ -20,6 +20,14 @@ public class DisciTrack {
     private final Storage storage;
     private final TaskList tasks;
     private final Ui ui;
+    private boolean shouldExit;
+
+    /**
+     * Creates a DisciTrack application for use by the graphical user interface.
+     */
+    public DisciTrack() {
+        this(FILE_PATH, false);
+    }
 
     /**
      * Creates a DisciTrack application that stores tasks at the given file path.
@@ -27,7 +35,11 @@ public class DisciTrack {
      * @param filePath path to the file used for saving and loading tasks.
      */
     public DisciTrack(String filePath) {
-        ui = new Ui();
+        this(filePath, true);
+    }
+
+    private DisciTrack(String filePath, boolean shouldPrintResponses) {
+        ui = new Ui(shouldPrintResponses);
         storage = new Storage(filePath);
         tasks = new TaskList(loadTasks());
     }
@@ -63,6 +75,45 @@ public class DisciTrack {
                 ui.showSaveError();
             }
         }
+    }
+
+    /**
+     * Returns the greeting shown when the graphical user interface opens.
+     *
+     * @return the DisciTrack greeting.
+     */
+    public String getGreeting() {
+        return ui.getGreeting();
+    }
+
+    /**
+     * Processes one user command and returns the response for the graphical interface.
+     *
+     * @param input the command entered by the user.
+     * @return the response produced after processing the command.
+     */
+    public String getResponse(String input) {
+        shouldExit = false;
+        try {
+            Command parsedCommand = Parser.parse(input);
+            parsedCommand.execute(tasks, ui, storage);
+            shouldExit = parsedCommand.isExit();
+        } catch (DisciTrackException e) {
+            ui.showError(e.getMessage());
+        } catch (IOException e) {
+            ui.showSaveError();
+        }
+
+        return ui.getLastResponse();
+    }
+
+    /**
+     * Returns whether the latest graphical-interface command should close the application.
+     *
+     * @return true if the latest command was an exit command.
+     */
+    public boolean shouldExit() {
+        return shouldExit;
     }
 
     /**

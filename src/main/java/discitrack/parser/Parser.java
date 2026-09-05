@@ -9,6 +9,7 @@ import discitrack.command.CheckDateCommand;
 import discitrack.command.Command;
 import discitrack.command.DeleteCommand;
 import discitrack.command.FindCommand;
+import discitrack.command.HelpCommand;
 import discitrack.command.ListCommand;
 import discitrack.command.MarkCommand;
 import discitrack.command.UnmarkCommand;
@@ -34,6 +35,8 @@ public class Parser {
 
         if (commandWord.equals("bye")) {
             return new ByeCommand();
+        } else if (commandWord.equals("help")) {
+            return new HelpCommand();
         } else if (commandWord.equals("list")) {
             return new ListCommand();
         } else if (commandWord.equals("mark")) {

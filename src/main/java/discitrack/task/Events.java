@@ -50,6 +50,6 @@ public class Events extends Task {
     public String toString() {
         String stringFrom = DateTimeFormatter.ofPattern("MMM dd yyyy").format(from);
         String stringTo = DateTimeFormatter.ofPattern("MMM dd yyyy").format(to);
-        return String.format("[E]%s (from: %s to: %s)", super.toString(), stringFrom, stringTo);
+        return String.format("[E] %s (from: %s to: %s)", super.toString(), stringFrom, stringTo);
     }
 }

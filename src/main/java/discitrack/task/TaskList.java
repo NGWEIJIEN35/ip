@@ -83,7 +83,7 @@ public class TaskList {
      * Finds tasks that are relevant to the given date.
      *
      * @param date the date to search for.
-     * @return tasks with a deadline on the date or an event boundary on the date.
+     * @return tasks with a deadline on the date or an event occurring on the date.
      */
     public List<Task> findTasksByDate(LocalDate date) {
         List<Task> tasksMatchedDate = new ArrayList<>();
@@ -95,7 +95,8 @@ public class TaskList {
 
             if (task instanceof Events) {
                 Events event = (Events) task;
-                if (event.getFrom().equals(date) || event.getTo().equals(date)) {
+                boolean isDuringEvent = !date.isBefore(event.getFrom()) && !date.isAfter(event.getTo());
+                if (isDuringEvent) {
                     tasksMatchedDate.add(task);
                 }
             }

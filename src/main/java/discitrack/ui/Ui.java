@@ -10,14 +10,43 @@ import discitrack.task.Task;
  */
 public class Ui {
     private static final String LINE = "____________________________________________________________";
+    private static final String GREETING = "Hi! I'm DisciTrack, your discipline coach.\n"
+            + "What are we getting done today?\n"
+            + "Type help or click Commands if you need examples.";
+    private static final String HELP_MESSAGE = "Here are the commands you can use:\n\n"
+            + "todo DESCRIPTION\n  Example: todo exercise\n\n"
+            + "deadline DESCRIPTION /by yyyy-MM-dd\n  Example: deadline pay bills /by 2026-09-10\n\n"
+            + "event DESCRIPTION /from yyyy-MM-dd /to yyyy-MM-dd\n"
+            + "  Example: event holiday /from 2026-09-15 /to 2026-09-18\n\n"
+            + "list\n  Shows all tasks.\n\n"
+            + "mark NUMBER\n  Example: mark 1\n\n"
+            + "unmark NUMBER\n  Example: unmark 1\n\n"
+            + "delete NUMBER\n  Example: delete 1\n\n"
+            + "find KEYWORD\n  Example: find exercise\n\n"
+            + "checkdate yyyy-MM-dd\n  Shows deadlines and events occurring on that date.\n"
+            + "  Example: checkdate 2026-09-10\n\n"
+            + "help\n  Shows this command guide.\n\n"
+            + "bye\n  Ends the conversation.";
 
     private final Scanner scanner;
+    private final boolean shouldPrintResponses;
+    private String lastResponse = "";
 
     /**
      * Creates a UI that reads commands from standard input.
      */
     public Ui() {
+        this(true);
+    }
+
+    /**
+     * Creates a UI that can optionally print responses to standard output.
+     *
+     * @param shouldPrintResponses whether responses should be printed to the terminal.
+     */
+    public Ui(boolean shouldPrintResponses) {
         this.scanner = new Scanner(System.in);
+        this.shouldPrintResponses = shouldPrintResponses;
     }
 
     /**
@@ -31,12 +60,13 @@ public class Ui {
                 + "| |_| | | |\\__ \\| (__ | |   | |  | |   | (_| | (__ |   <  \n"
                 + "|____/  |_||___/ \\___||_|   |_|  |_|    \\__,_|\\___||_|\\_\\ \n"
                 + LINE + "\n"
-                + "Hello! I am DisciTrack.\n"
-                + "My job is to keep your discipline on track.\n"
-                + "How can I help you?\n"
+                + GREETING + "\n"
                 + LINE;
 
-        System.out.println(greeting);
+        lastResponse = GREETING;
+        if (shouldPrintResponses) {
+            System.out.println(greeting);
+        }
     }
 
     /**
@@ -52,9 +82,14 @@ public class Ui {
      * Displays the farewell message.
      */
     public void showBye() {
-        showLine();
-        System.out.println("Bye bye! Well done today, keep it up! Hope to see you again soon!");
-        showLine();
+        showResponse("Bye bye! Well done today, keep it up! Hope to see you again soon!");
+    }
+
+    /**
+     * Displays the supported commands and examples.
+     */
+    public void showHelp() {
+        showResponse(HELP_MESSAGE);
     }
 
     /**
@@ -63,17 +98,18 @@ public class Ui {
      * @param tasks the tasks to display.
      */
     public void showTaskList(List<Task> tasks) {
-        showLine();
-
         if (tasks.isEmpty()) {
-            System.out.println("Congratulations! You have no tasks currently!");
+            showResponse("Congratulations! You have no tasks currently!");
         } else {
+            StringBuilder response = new StringBuilder();
             for (int i = 0; i < tasks.size(); i++) {
-                System.out.println((i + 1) + ". " + tasks.get(i));
+                response.append(i + 1).append(". ").append(tasks.get(i));
+                if (i < tasks.size() - 1) {
+                    response.append(System.lineSeparator());
+                }
             }
+            showResponse(response.toString());
         }
-
-        showLine();
     }
 
     /**
@@ -82,10 +118,9 @@ public class Ui {
      * @param task the task that was marked.
      */
     public void showTaskMarked(Task task) {
-        showLine();
-        System.out.println("Well done, I have marked this task as done!");
-        System.out.println(task);
-        showLine();
+        showResponse("Well done! You completed:\n\n"
+                + task + "\n\n"
+                + "Keep the momentum going! You can do it!");
     }
 
     /**
@@ -94,10 +129,7 @@ public class Ui {
      * @param task the task that was unmarked.
      */
     public void showTaskUnmarked(Task task) {
-        showLine();
-        System.out.println("I have marked this task as not done yet, try to finish soon!");
-        System.out.println(task);
-        showLine();
+        showResponse("I have marked this task as not done yet, try to finish soon!\n" + task);
     }
 
     /**
@@ -106,17 +138,15 @@ public class Ui {
      * @param tasksMatchedDate tasks that match the searched date.
      */
     public void showDateMatches(List<Task> tasksMatchedDate) {
-        showLine();
-
         if (tasksMatchedDate.isEmpty()) {
-            System.out.println("There is no tasks found on this date!");
+            showResponse("There are no deadlines or events on this date.");
         } else {
+            StringBuilder response = new StringBuilder("Here are your tasks for this date:\n");
             for (Task task : tasksMatchedDate) {
-                System.out.println(task);
+                response.append(task).append(System.lineSeparator());
             }
+            showResponse(response.toString().stripTrailing());
         }
-
-        showLine();
     }
 
     /**
@@ -125,18 +155,18 @@ public class Ui {
      * @param matchingTasks tasks that match the searched keyword.
      */
     public void showFoundTasks(List<Task> matchingTasks) {
-        showLine();
-
         if (matchingTasks.isEmpty()) {
-            System.out.println("There are no matching tasks in your list.");
+            showResponse("There are no matching tasks in your list.");
         } else {
-            System.out.println("Here are the matching tasks in your list:");
+            StringBuilder response = new StringBuilder("Here are the matching tasks in your list:\n");
             for (int i = 0; i < matchingTasks.size(); i++) {
-                System.out.println((i + 1) + "." + matchingTasks.get(i));
+                response.append(i + 1).append(".").append(matchingTasks.get(i));
+                if (i < matchingTasks.size() - 1) {
+                    response.append(System.lineSeparator());
+                }
             }
+            showResponse(response.toString());
         }
-
-        showLine();
     }
 
     /**
@@ -146,11 +176,11 @@ public class Ui {
      * @param taskCount the number of tasks after adding the task.
      */
     public void showTaskAdded(Task task, int taskCount) {
-        showLine();
-        System.out.println("Alright! I have added this task:");
-        System.out.println(task);
-        System.out.println(String.format("Now you have %d tasks in the list.", taskCount));
-        showLine();
+        String taskWord = taskCount == 1 ? "task" : "tasks";
+        showResponse("Alright! I've added this task:\n\n"
+                + task + "\n"
+                + String.format("You now have %d %s.\n\n", taskCount, taskWord)
+                + "Lock in! Try to finish as soon as possible!");
     }
 
     /**
@@ -160,10 +190,9 @@ public class Ui {
      * @param taskCount the number of tasks after deleting the task.
      */
     public void showTaskDeleted(Task removedTask, int taskCount) {
-        showLine();
-        System.out.println("Alright! I have deleted this task.");
-        System.out.println(removedTask);
-        System.out.println(String.format("Now you have %d tasks in the list.", taskCount));
+        showResponse("Alright! I have deleted this task.\n"
+                + removedTask + "\n"
+                + String.format("Now you have %d tasks in the list.", taskCount));
     }
 
     /**
@@ -172,9 +201,7 @@ public class Ui {
      * @param message the error message to display.
      */
     public void showError(String message) {
-        showLine();
-        System.out.println(message);
-        showLine();
+        showResponse(message);
     }
 
     /**
@@ -182,6 +209,33 @@ public class Ui {
      */
     public void showSaveError() {
         showError("UHOH! I could not save your tasks.");
+    }
+
+    /**
+     * Returns the latest response produced by this UI.
+     *
+     * @return the latest response text.
+     */
+    public String getLastResponse() {
+        return lastResponse;
+    }
+
+    /**
+     * Returns the welcome message used by both interfaces.
+     *
+     * @return the DisciTrack welcome message.
+     */
+    public String getGreeting() {
+        return GREETING;
+    }
+
+    private void showResponse(String response) {
+        lastResponse = response;
+        if (shouldPrintResponses) {
+            showLine();
+            System.out.println(response);
+            showLine();
+        }
     }
 
     private void showLine() {

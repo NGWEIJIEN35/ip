@@ -20,6 +20,6 @@ public class ToDos extends Task {
      */
     @Override
     public String toString() {
-        return "[T]" + super.toString();
+        return "[T] " + super.toString();
     }
 }

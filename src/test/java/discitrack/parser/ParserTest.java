@@ -13,6 +13,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import discitrack.command.Command;
 import discitrack.command.FindCommand;
+import discitrack.command.HelpCommand;
 import discitrack.exception.DisciTrackException;
 import discitrack.storage.Storage;
 import discitrack.task.Deadlines;
@@ -64,6 +65,13 @@ public class ParserTest {
         Command command = Parser.parse("find book");
 
         assertInstanceOf(FindCommand.class, command);
+    }
+
+    @Test
+    public void parse_help_returnsHelpCommand() throws DisciTrackException {
+        Command command = Parser.parse("help");
+
+        assertInstanceOf(HelpCommand.class, command);
     }
 
     @Test
