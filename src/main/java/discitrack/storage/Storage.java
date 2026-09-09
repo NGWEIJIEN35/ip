@@ -9,10 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import discitrack.task.Deadlines;
-import discitrack.task.Events;
+import discitrack.task.Deadline;
+import discitrack.task.Event;
 import discitrack.task.Task;
-import discitrack.task.ToDos;
+import discitrack.task.Todo;
 
 /**
  * Handles loading tasks from disk and saving tasks back to disk.
@@ -91,11 +91,11 @@ public class Storage {
 
     private Task createTask(String taskType, String[] parts) {
         if (taskType.equals("T")) {
-            return new ToDos(parts[2]);
+            return new Todo(parts[2]);
         } else if (taskType.equals("D")) {
-            return new Deadlines(parts[2], LocalDate.parse(parts[3]));
+            return new Deadline(parts[2], LocalDate.parse(parts[3]));
         } else if (taskType.equals("E")) {
-            return new Events(parts[2], LocalDate.parse(parts[3]),
+            return new Event(parts[2], LocalDate.parse(parts[3]),
                     LocalDate.parse(parts[4]));
         } else {
             throw new IllegalArgumentException(
@@ -112,13 +112,13 @@ public class Storage {
     private String taskToFileLine(Task task) {
         String status = task.isDone() ? "1" : "0";
 
-        if (task instanceof ToDos) {
+        if (task instanceof Todo) {
             return "T | " + status + " | " + task.getActivity();
-        } else if (task instanceof Deadlines) {
-            Deadlines deadline = (Deadlines) task;
+        } else if (task instanceof Deadline) {
+            Deadline deadline = (Deadline) task;
             return "D | " + status + " | " + deadline.getActivity() + " | " + deadline.getTime();
-        } else if (task instanceof Events) {
-            Events event = (Events) task;
+        } else if (task instanceof Event) {
+            Event event = (Event) task;
             return "E | " + status + " | " + event.getActivity()
                     + " | " + event.getFrom() + " | " + event.getTo();
         } else {

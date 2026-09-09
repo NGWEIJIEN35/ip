@@ -14,9 +14,9 @@ import discitrack.command.ListCommand;
 import discitrack.command.MarkCommand;
 import discitrack.command.UnmarkCommand;
 import discitrack.exception.DisciTrackException;
-import discitrack.task.Deadlines;
-import discitrack.task.Events;
-import discitrack.task.ToDos;
+import discitrack.task.Deadline;
+import discitrack.task.Event;
+import discitrack.task.Todo;
 
 /**
  * Parses user input into executable commands.
@@ -122,12 +122,12 @@ public class Parser {
      * @return the todo task described by the command.
      * @throws DisciTrackException if the todo activity is empty.
      */
-    private static ToDos parseTodo(String activity) throws DisciTrackException {
+    private static Todo parseTodo(String activity) throws DisciTrackException {
         if (activity.isEmpty()) {
             throw new DisciTrackException("UHOH! The activity of a todo cannot be empty!");
         }
 
-        return new ToDos(activity);
+        return new Todo(activity);
     }
 
     /**
@@ -137,7 +137,7 @@ public class Parser {
      * @return the deadline task described by the command.
      * @throws DisciTrackException if the activity, /by keyword, or date is invalid.
      */
-    private static Deadlines parseDeadline(String input) throws DisciTrackException {
+    private static Deadline parseDeadline(String input) throws DisciTrackException {
         if (input.isEmpty()) {
             throw new DisciTrackException("UHOH! The activity of a deadline cannot be empty!");
         }
@@ -160,7 +160,7 @@ public class Parser {
         }
 
         try {
-            return new Deadlines(activity, LocalDate.parse(time));
+            return new Deadline(activity, LocalDate.parse(time));
         } catch (DateTimeParseException e) {
             throw new DisciTrackException("UHOH! Please enter the deadline date in yyyy-MM-dd format!");
         }
@@ -173,7 +173,7 @@ public class Parser {
      * @return the event task described by the command.
      * @throws DisciTrackException if the activity, /from keyword, /to keyword, or dates are invalid.
      */
-    private static Events parseEvent(String input) throws DisciTrackException {
+    private static Event parseEvent(String input) throws DisciTrackException {
         if (input.isEmpty()) {
             throw new DisciTrackException("UHOH! The activity of an event cannot be empty!");
         }
@@ -211,10 +211,10 @@ public class Parser {
         }
     }
 
-    private static Events createEvent(String activity, String startDate, String endDate)
+    private static Event createEvent(String activity, String startDate, String endDate)
             throws DisciTrackException {
         try {
-            return new Events(activity, LocalDate.parse(startDate), LocalDate.parse(endDate));
+            return new Event(activity, LocalDate.parse(startDate), LocalDate.parse(endDate));
         } catch (DateTimeParseException e) {
             throw new DisciTrackException("UHOH! Please enter event dates in yyyy-MM-dd format!");
         }

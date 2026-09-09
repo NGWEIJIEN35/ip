@@ -16,10 +16,10 @@ import discitrack.command.FindCommand;
 import discitrack.command.HelpCommand;
 import discitrack.exception.DisciTrackException;
 import discitrack.storage.Storage;
-import discitrack.task.Deadlines;
+import discitrack.task.Deadline;
 import discitrack.task.Task;
 import discitrack.task.TaskList;
-import discitrack.task.ToDos;
+import discitrack.task.Todo;
 import discitrack.ui.Ui;
 
 public class ParserTest {
@@ -35,7 +35,7 @@ public class ParserTest {
         command.execute(tasks, new Ui(), storage);
 
         Task task = tasks.get(1);
-        assertInstanceOf(ToDos.class, task);
+        assertInstanceOf(Todo.class, task);
         assertEquals("sleep", task.getActivity());
     }
 
@@ -48,9 +48,9 @@ public class ParserTest {
         command.execute(tasks, new Ui(), storage);
 
         Task task = tasks.get(1);
-        assertInstanceOf(Deadlines.class, task);
+        assertInstanceOf(Deadline.class, task);
 
-        Deadlines deadline = (Deadlines) task;
+        Deadline deadline = (Deadline) task;
         assertEquals("homework", deadline.getActivity());
         assertEquals(LocalDate.parse("2026-08-29"), deadline.getTime());
     }
