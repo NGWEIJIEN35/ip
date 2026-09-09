@@ -3,6 +3,7 @@ package discitrack.task;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import discitrack.exception.DisciTrackException;
 
@@ -86,23 +87,20 @@ public class TaskList {
      * @return tasks with a deadline on the date or an event occurring on the date.
      */
     public List<Task> findTasksByDate(LocalDate date) {
-        List<Task> tasksMatchedDate = new ArrayList<>();
+        return tasks.stream()
+                .filter(task -> {
+                    if (task instanceof Deadlines) {
+                        Deadlines deadline = (Deadlines) task;
+                        return deadline.getTime().equals(date);
+                    }
 
-        for (Task task : tasks) {
-            if (task instanceof Deadlines && ((Deadlines) task).getTime().equals(date)) {
-                tasksMatchedDate.add(task);
-            }
-
-            if (task instanceof Events) {
-                Events event = (Events) task;
-                boolean isDuringEvent = !date.isBefore(event.getFrom()) && !date.isAfter(event.getTo());
-                if (isDuringEvent) {
-                    tasksMatchedDate.add(task);
-                }
-            }
-        }
-
-        return tasksMatchedDate;
+                    if (task instanceof Events) {
+                        Events event = (Events) task;
+                        return !date.isBefore(event.getFrom()) && !date.isAfter(event.getTo());
+                    }
+                    return false;
+                })
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     /**
@@ -112,16 +110,11 @@ public class TaskList {
      * @return tasks whose activity descriptions contain the keyword.
      */
     public List<Task> findTasksByKeyword(String keyword) {
-        List<Task> matchingTasks = new ArrayList<>();
         String keywordToFind = keyword.toLowerCase();
 
-        for (Task task : tasks) {
-            if (task.getActivity().toLowerCase().contains(keywordToFind)) {
-                matchingTasks.add(task);
-            }
-        }
-
-        return matchingTasks;
+        return tasks.stream()
+                .filter(task -> task.getActivity().toLowerCase().contains(keywordToFind))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     /**
