@@ -33,7 +33,13 @@ public class AddCommand extends Command {
      */
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) throws IOException {
+        int originalTaskCount = tasks.size();
+
         tasks.add(task);
+
+        assert tasks.size() == originalTaskCount + 1
+                : "Adding one task must increase the task count by one.";
+
         storage.save(tasks.asList());
         ui.showTaskAdded(task, tasks.size());
     }

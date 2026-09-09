@@ -30,6 +30,9 @@ public class Parser {
      * @throws DisciTrackException if the command is unknown or has an invalid format.
      */
     public static Command parse(String fullCommand) throws DisciTrackException {
+        assert fullCommand != null
+                : "A command must be provided before parsing.";
+
         String command = fullCommand.trim();
         String commandWord = command.split(" ", 2)[0];
 
