@@ -81,8 +81,12 @@ public class Storage {
                 task = new ToDos(parts[2]);
             } else if (taskType.equals("D")) {
                 task = new Deadlines(parts[2], LocalDate.parse(parts[3]));
+            } else if (taskType.equals("E")) {
+                task = new Events(parts[2], LocalDate.parse(parts[3]),
+                        LocalDate.parse(parts[4]));
             } else {
-                task = new Events(parts[2], LocalDate.parse(parts[3]), LocalDate.parse(parts[4]));
+                throw new IllegalArgumentException(
+                        "Unsupported task type in data file: " + taskType);
             }
 
             if (status.equals("1")) {
@@ -112,9 +116,11 @@ public class Storage {
             return "D | " + status + " | " + deadline.getActivity() + " | " + deadline.getTime();
         } else if (task instanceof Events) {
             Events event = (Events) task;
-            return "E | " + status + " | " + event.getActivity() + " | " + event.getFrom() + " | " + event.getTo();
+            return "E | " + status + " | " + event.getActivity()
+                    + " | " + event.getFrom() + " | " + event.getTo();
+        } else {
+            throw new IllegalArgumentException(
+                    "Unsupported task type: " + task.getClass().getSimpleName());
         }
-
-        return "";
     }
 }
