@@ -69,35 +69,38 @@ public class Storage {
         Scanner fileScanner = new Scanner(dataFile);
 
         while (fileScanner.hasNextLine()) {
-            String line = fileScanner.nextLine();
-            String[] parts = line.split(" \\| ");
-
-            String taskType = parts[0];
-            String status = parts[1];
-
-            Task task;
-
-            if (taskType.equals("T")) {
-                task = new ToDos(parts[2]);
-            } else if (taskType.equals("D")) {
-                task = new Deadlines(parts[2], LocalDate.parse(parts[3]));
-            } else if (taskType.equals("E")) {
-                task = new Events(parts[2], LocalDate.parse(parts[3]),
-                        LocalDate.parse(parts[4]));
-            } else {
-                throw new IllegalArgumentException(
-                        "Unsupported task type in data file: " + taskType);
-            }
-
-            if (status.equals("1")) {
-                task.markAsDone();
-            }
-
-            tasks.add(task);
+            tasks.add(parseTaskFromFileLine(fileScanner.nextLine()));
         }
 
         fileScanner.close();
         return tasks;
+    }
+
+    private Task parseTaskFromFileLine(String line) {
+        String[] parts = line.split(" \\| ");
+        String taskType = parts[0];
+        String status = parts[1];
+        Task task = createTask(taskType, parts);
+
+        if (status.equals("1")) {
+            task.markAsDone();
+        }
+
+        return task;
+    }
+
+    private Task createTask(String taskType, String[] parts) {
+        if (taskType.equals("T")) {
+            return new ToDos(parts[2]);
+        } else if (taskType.equals("D")) {
+            return new Deadlines(parts[2], LocalDate.parse(parts[3]));
+        } else if (taskType.equals("E")) {
+            return new Events(parts[2], LocalDate.parse(parts[3]),
+                    LocalDate.parse(parts[4]));
+        } else {
+            throw new IllegalArgumentException(
+                    "Unsupported task type in data file: " + taskType);
+        }
     }
 
     /**
