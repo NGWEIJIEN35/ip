@@ -178,37 +178,43 @@ public class Parser {
             throw new DisciTrackException("UHOH! The activity of an event cannot be empty!");
         }
 
-        String[] fromSplit = input.split("\\s+/from\\s+", 2);
+        String[] eventAndDates = splitEventDetails(input, "/from");
+        String[] startAndEndDates = splitEventDetails(eventAndDates[1], "/to");
+        String activity = eventAndDates[0].trim();
+        String startDate = startAndEndDates[0].trim();
+        String endDate = startAndEndDates[1].trim();
 
-        if (fromSplit.length < 2) {
+        validateEventDetails(activity, startDate, endDate);
+        return createEvent(activity, startDate, endDate);
+    }
+
+    private static String[] splitEventDetails(String input, String separator) throws DisciTrackException {
+        String[] parts = input.split("\\s+" + separator + "\\s+", 2);
+        if (parts.length < 2) {
             throw new DisciTrackException("UHOH! An event needs both /from and /to!");
         }
+        return parts;
+    }
 
-        String activity = fromSplit[0].trim();
-
-        String[] toSplit = fromSplit[1].split("\\s+/to\\s+", 2);
-
-        if (toSplit.length < 2) {
-            throw new DisciTrackException("UHOH! An event needs both /from and /to!");
-        }
-
-        String from = toSplit[0].trim();
-        String to = toSplit[1].trim();
-
+    private static void validateEventDetails(String activity, String startDate, String endDate)
+            throws DisciTrackException {
         if (activity.isEmpty()) {
             throw new DisciTrackException("UHOH! The activity of an event cannot be empty!");
         }
 
-        if (from.isEmpty()) {
+        if (startDate.isEmpty()) {
             throw new DisciTrackException("UHOH! The start time of an event cannot be empty!");
         }
 
-        if (to.isEmpty()) {
+        if (endDate.isEmpty()) {
             throw new DisciTrackException("UHOH! The end time of an event cannot be empty!");
         }
+    }
 
+    private static Events createEvent(String activity, String startDate, String endDate)
+            throws DisciTrackException {
         try {
-            return new Events(activity, LocalDate.parse(from), LocalDate.parse(to));
+            return new Events(activity, LocalDate.parse(startDate), LocalDate.parse(endDate));
         } catch (DateTimeParseException e) {
             throw new DisciTrackException("UHOH! Please enter event dates in yyyy-MM-dd format!");
         }
