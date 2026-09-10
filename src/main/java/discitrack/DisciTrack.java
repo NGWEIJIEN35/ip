@@ -1,6 +1,5 @@
 package discitrack;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -16,11 +15,14 @@ import discitrack.ui.Ui;
  */
 public class DisciTrack {
     private static final String FILE_PATH = "data/discitrack.txt";
+    private static final String LOAD_BLOCKED_MESSAGE = "UHOH! Task commands are disabled because your saved data "
+            + "could not be loaded. Fix the file and restart.";
 
     private final Storage storage;
     private final TaskList tasks;
     private final Ui ui;
     private boolean shouldExit;
+    private String loadError;
 
     /**
      * Creates a DisciTrack application for use by the graphical user interface.
@@ -57,7 +59,11 @@ public class DisciTrack {
      * Reads user commands until the user exits the application.
      */
     public void run() {
-        ui.showGreeting();
+        if (loadError == null) {
+            ui.showGreeting();
+        } else {
+            ui.showError(getGreeting());
+        }
 
         while (true) {
             String command = ui.readCommand();
@@ -74,6 +80,10 @@ public class DisciTrack {
      * @return the DisciTrack greeting.
      */
     public String getGreeting() {
+        if (loadError != null) {
+            return "UHOH! Could not load your tasks: " + loadError + "." + System.lineSeparator()
+                    + "Task commands are disabled to protect your saved data. Fix the file and restart.";
+        }
         return ui.getGreeting();
     }
 
@@ -90,6 +100,10 @@ public class DisciTrack {
     }
 
     private boolean executeCommand(String input) {
+        if (loadError != null && !input.trim().equals("help") && !input.trim().equals("bye")) {
+            ui.showError(LOAD_BLOCKED_MESSAGE);
+            return false;
+        }
         try {
             Command parsedCommand = Parser.parse(input);
             parsedCommand.execute(tasks, ui, storage);
@@ -120,7 +134,8 @@ public class DisciTrack {
     private ArrayList<Task> loadTasks() {
         try {
             return new ArrayList<>(storage.load());
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
+            loadError = e.getMessage();
             return new ArrayList<>();
         }
     }

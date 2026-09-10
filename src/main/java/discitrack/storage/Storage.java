@@ -1,13 +1,14 @@
 package discitrack.storage;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Scanner;
 
 import discitrack.task.Deadline;
 import discitrack.task.Event;
@@ -19,6 +20,7 @@ import discitrack.task.Todo;
  */
 public class Storage {
     private final String filePath;
+    private boolean isLoadBlocked;
 
     /**
      * Creates a storage manager for the given file path.
@@ -36,56 +38,89 @@ public class Storage {
      * @throws IOException if the file cannot be written.
      */
     public void save(List<Task> tasks) throws IOException {
-        File dataFile = new File(filePath);
-        File dataFolder = dataFile.getParentFile();
-
-        if (dataFolder != null && !dataFolder.exists()) {
-            dataFolder.mkdir();
+        if (isLoadBlocked) {
+            throw new IOException("Saved data could not be loaded; saving is disabled.");
         }
-
-        FileWriter writer = new FileWriter(dataFile);
-
+        List<String> lines = new ArrayList<>();
         for (Task task : tasks) {
-            writer.write(taskToFileLine(task) + System.lineSeparator());
+            String line = taskToFileLine(task);
+            if (!task.getTags().isEmpty()) {
+                line += " | tags=" + String.join(",", task.getTags());
+            }
+            lines.add(line);
         }
+        Path target = Path.of(filePath).toAbsolutePath();
+        Files.createDirectories(target.getParent());
+        Path temporary = Files.createTempFile(target.getParent(), ".discitrack-", ".tmp");
+        try {
+            Files.write(temporary, lines, Charset.defaultCharset());
+            replaceFile(temporary, target);
+        } finally {
+            Files.deleteIfExists(temporary);
+        }
+    }
 
-        writer.close();
+    /**
+     * Replaces the data file without exposing a partly written file.
+     * No non-atomic fallback is used when the file system cannot support it.
+     *
+     * @param temporary the fully written temporary file beside the target.
+     * @param target the data file to replace.
+     * @throws IOException if the atomic replacement fails.
+     */
+    protected void replaceFile(Path temporary, Path target) throws IOException {
+        Files.move(temporary, target, StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
     }
 
     /**
      * Loads tasks from the configured data file.
      *
      * @return the tasks stored in the data file, or an empty list if the file does not exist.
-     * @throws FileNotFoundException if the file cannot be opened for reading.
+     * @throws IOException if the file cannot be read or contains malformed data.
      */
-    public List<Task> load() throws FileNotFoundException {
+    public List<Task> load() throws IOException {
         List<Task> tasks = new ArrayList<>();
-        File dataFile = new File(filePath);
-
-        if (!dataFile.exists()) {
+        Path dataFile = Path.of(filePath);
+        if (Files.notExists(dataFile)) {
             return tasks;
         }
-
-        Scanner fileScanner = new Scanner(dataFile);
-
-        while (fileScanner.hasNextLine()) {
-            tasks.add(parseTaskFromFileLine(fileScanner.nextLine()));
+        try {
+            List<String> lines = Files.readAllLines(dataFile, Charset.defaultCharset());
+            for (int i = 0; i < lines.size(); i++) {
+                tasks.add(parseTaskFromFileLine(lines.get(i), i + 1));
+            }
+        } catch (IOException e) {
+            isLoadBlocked = true;
+            throw e;
         }
-
-        fileScanner.close();
         return tasks;
     }
 
-    private Task parseTaskFromFileLine(String line) {
-        String[] parts = line.split(" \\| ");
-        String taskType = parts[0];
-        String status = parts[1];
-        Task task = createTask(taskType, parts);
-
-        if (status.equals("1")) {
-            task.markAsDone();
+    private Task parseTaskFromFileLine(String line, int lineNumber) throws IOException {
+        String[] parts = line.split(" \\| ", -1);
+        Task task;
+        int fieldCount;
+        try {
+            task = createTask(parts[0], parts);
+            fieldCount = task instanceof Todo ? 3 : task instanceof Deadline ? 4 : 5;
+            if (parts[1].equals("1")) {
+                task.markAsDone();
+            } else if (!parts[1].equals("0")) {
+                throw new IllegalArgumentException("Invalid status");
+            }
+        } catch (IllegalArgumentException | IndexOutOfBoundsException e) {
+            throw new IOException("invalid task data on line " + lineNumber, e);
         }
-
+        if (parts.length > fieldCount) {
+            try {
+                if (parts.length != fieldCount + 1 || !parts[fieldCount].startsWith("tags=")) {
+                    throw new IllegalArgumentException("Unexpected tag field");
+                }
+                task.replaceTags(Arrays.asList(parts[fieldCount].substring(5).split(",", -1)));
+            } catch (IllegalArgumentException e) {
+                throw new IOException("invalid tag data on line " + lineNumber, e);
+            }
+        }
         return task;
     }
 
