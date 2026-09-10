@@ -6,7 +6,7 @@ import java.time.format.DateTimeFormatter;
 /**
  * Represents a task that must be done by a specific date.
  */
-public class Deadlines extends Task {
+public class Deadline extends Task {
     private LocalDate time;
 
     /**
@@ -15,7 +15,7 @@ public class Deadlines extends Task {
      * @param activity the activity represented by the deadline.
      * @param time the due date of the deadline.
      */
-    public Deadlines(String activity, LocalDate time) {
+    public Deadline(String activity, LocalDate time) {
         super(activity);
         this.time = time;
     }

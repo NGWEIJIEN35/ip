@@ -6,7 +6,7 @@ import java.time.format.DateTimeFormatter;
 /**
  * Represents a task that happens over a date range.
  */
-public class Events extends Task {
+public class Event extends Task {
     private final LocalDate from;
     private final LocalDate to;
 
@@ -17,7 +17,7 @@ public class Events extends Task {
      * @param from the start date of the event.
      * @param to the end date of the event.
      */
-    public Events(String activity, LocalDate from, LocalDate to) {
+    public Event(String activity, LocalDate from, LocalDate to) {
         super(activity);
         this.from = from;
         this.to = to;

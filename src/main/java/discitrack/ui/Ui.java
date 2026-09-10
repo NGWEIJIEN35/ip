@@ -101,14 +101,7 @@ public class Ui {
         if (tasks.isEmpty()) {
             showResponse("Congratulations! You have no tasks currently!");
         } else {
-            StringBuilder response = new StringBuilder();
-            for (int i = 0; i < tasks.size(); i++) {
-                response.append(i + 1).append(". ").append(tasks.get(i));
-                if (i < tasks.size() - 1) {
-                    response.append(System.lineSeparator());
-                }
-            }
-            showResponse(response.toString());
+            showResponse(formatNumberedTasks(tasks));
         }
     }
 
@@ -163,14 +156,9 @@ public class Ui {
         if (matchingTasks.isEmpty()) {
             showResponse("There are no matching tasks in your list.");
         } else {
-            StringBuilder response = new StringBuilder("Here are the matching tasks in your list:\n");
-            for (int i = 0; i < matchingTasks.size(); i++) {
-                response.append(i + 1).append(".").append(matchingTasks.get(i));
-                if (i < matchingTasks.size() - 1) {
-                    response.append(System.lineSeparator());
-                }
-            }
-            showResponse(response.toString());
+            showResponse(
+                    "Here are the matching tasks in your list:",
+                    formatNumberedTasks(matchingTasks));
         }
     }
 
@@ -236,6 +224,17 @@ public class Ui {
      */
     public String getGreeting() {
         return GREETING;
+    }
+
+    private static String formatNumberedTasks(List<Task> tasks) {
+        StringBuilder response = new StringBuilder();
+        for (int i = 0; i < tasks.size(); i++) {
+            response.append(i + 1).append(". ").append(tasks.get(i));
+            if (i < tasks.size() - 1) {
+                response.append(System.lineSeparator());
+            }
+        }
+        return response.toString();
     }
 
     private void showResponse(String... responseLines) {

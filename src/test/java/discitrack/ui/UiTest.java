@@ -4,13 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
-import discitrack.task.ToDos;
+import discitrack.task.Todo;
 
 public class UiTest {
     @Test
     public void showTaskMarked_multipleResponseLines_joinsLines() {
         Ui ui = new Ui(false);
-        ToDos task = new ToDos("read chapter");
+        Todo task = new Todo("read chapter");
         task.markAsDone();
 
         ui.showTaskMarked(task);

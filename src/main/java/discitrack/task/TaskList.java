@@ -92,12 +92,12 @@ public class TaskList {
         List<Task> tasksMatchedDate = new ArrayList<>();
 
         for (Task task : tasks) {
-            if (task instanceof Deadlines && ((Deadlines) task).getTime().equals(date)) {
+            if (task instanceof Deadline && ((Deadline) task).getTime().equals(date)) {
                 tasksMatchedDate.add(task);
             }
 
-            if (task instanceof Events) {
-                Events event = (Events) task;
+            if (task instanceof Event) {
+                Event event = (Event) task;
                 boolean isDuringEvent = !date.isBefore(event.getFrom()) && !date.isAfter(event.getTo());
                 if (isDuringEvent) {
                     tasksMatchedDate.add(task);

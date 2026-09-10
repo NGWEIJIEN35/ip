@@ -14,9 +14,9 @@ import discitrack.command.ListCommand;
 import discitrack.command.MarkCommand;
 import discitrack.command.UnmarkCommand;
 import discitrack.exception.DisciTrackException;
-import discitrack.task.Deadlines;
-import discitrack.task.Events;
-import discitrack.task.ToDos;
+import discitrack.task.Deadline;
+import discitrack.task.Event;
+import discitrack.task.Todo;
 
 /**
  * Parses user input into executable commands.
@@ -34,7 +34,9 @@ public class Parser {
                 : "A command must be provided before parsing.";
 
         String command = fullCommand.trim();
-        String commandWord = command.split(" ", 2)[0];
+        String[] commandParts = command.split(" ", 2);
+        String commandWord = commandParts[0];
+        String arguments = commandParts.length > 1 ? commandParts[1].trim() : "";
 
         if (commandWord.equals("bye")) {
             return new ByeCommand();
@@ -43,21 +45,21 @@ public class Parser {
         } else if (commandWord.equals("list")) {
             return new ListCommand();
         } else if (commandWord.equals("mark")) {
-            return new MarkCommand(parseTaskNumber(command, 5));
+            return new MarkCommand(parseTaskNumber(arguments));
         } else if (commandWord.equals("unmark")) {
-            return new UnmarkCommand(parseTaskNumber(command, 7));
+            return new UnmarkCommand(parseTaskNumber(arguments));
         } else if (commandWord.equals("checkdate")) {
-            return new CheckDateCommand(parseCheckDate(command));
+            return new CheckDateCommand(parseCheckDate(arguments));
         } else if (commandWord.equals("find")) {
-            return new FindCommand(parseFindKeyword(command));
+            return new FindCommand(parseFindKeyword(arguments));
         } else if (commandWord.equals("todo")) {
-            return new AddCommand(parseTodo(command));
+            return new AddCommand(parseTodo(arguments));
         } else if (commandWord.equals("deadline")) {
-            return new AddCommand(parseDeadline(command));
+            return new AddCommand(parseDeadline(arguments));
         } else if (commandWord.equals("event")) {
-            return new AddCommand(parseEvent(command));
+            return new AddCommand(parseEvent(arguments));
         } else if (commandWord.equals("delete")) {
-            return new DeleteCommand(parseTaskNumber(command, 7));
+            return new DeleteCommand(parseTaskNumber(arguments));
         } else {
             throw new DisciTrackException("UHOH, I didn't know what you mean.");
         }
@@ -66,18 +68,11 @@ public class Parser {
     /**
      * Parses the task number after a command word.
      *
-     * @param command the full command entered by the user.
-     * @param commandWordLength the length of the command word before the task number.
+     * @param taskNumberString the task number entered by the user.
      * @return the one-based task number entered by the user.
      * @throws DisciTrackException if the task number is missing or invalid.
      */
-    private static int parseTaskNumber(String command, int commandWordLength) throws DisciTrackException {
-        String taskNumberString = "";
-
-        if (command.length() > commandWordLength) {
-            taskNumberString = command.substring(commandWordLength).trim();
-        }
-
+    private static int parseTaskNumber(String taskNumberString) throws DisciTrackException {
         if (taskNumberString.isEmpty()) {
             throw new DisciTrackException("UHOH! Please enter a task number!");
         }
@@ -92,13 +87,11 @@ public class Parser {
     /**
      * Parses the date supplied to a checkdate command.
      *
-     * @param command the full checkdate command.
+     * @param date the date entered by the user.
      * @return the date to check.
      * @throws DisciTrackException if the date is missing or not in yyyy-MM-dd format.
      */
-    private static LocalDate parseCheckDate(String command) throws DisciTrackException {
-        String date = command.substring(9).trim();
-
+    private static LocalDate parseCheckDate(String date) throws DisciTrackException {
         if (date.isEmpty()) {
             throw new DisciTrackException("UHOH! Please enter a date to check!");
         }
@@ -113,13 +106,11 @@ public class Parser {
     /**
      * Parses the keyword supplied to a find command.
      *
-     * @param command the full find command.
+     * @param keyword the keyword entered by the user.
      * @return the keyword to search for.
      * @throws DisciTrackException if the keyword is empty.
      */
-    private static String parseFindKeyword(String command) throws DisciTrackException {
-        String keyword = command.substring(4).trim();
-
+    private static String parseFindKeyword(String keyword) throws DisciTrackException {
         if (keyword.isEmpty()) {
             throw new DisciTrackException("UHOH! Please enter a keyword to find!");
         }
@@ -130,30 +121,26 @@ public class Parser {
     /**
      * Parses a todo command into a todo task.
      *
-     * @param command the full todo command.
+     * @param activity the todo activity entered by the user.
      * @return the todo task described by the command.
      * @throws DisciTrackException if the todo activity is empty.
      */
-    private static ToDos parseTodo(String command) throws DisciTrackException {
-        String activity = command.substring(4).trim();
-
+    private static Todo parseTodo(String activity) throws DisciTrackException {
         if (activity.isEmpty()) {
             throw new DisciTrackException("UHOH! The activity of a todo cannot be empty!");
         }
 
-        return new ToDos(activity);
+        return new Todo(activity);
     }
 
     /**
      * Parses a deadline command into a deadline task.
      *
-     * @param command the full deadline command.
+     * @param input the deadline details entered by the user.
      * @return the deadline task described by the command.
      * @throws DisciTrackException if the activity, /by keyword, or date is invalid.
      */
-    private static Deadlines parseDeadline(String command) throws DisciTrackException {
-        String input = command.substring(8).trim();
-
+    private static Deadline parseDeadline(String input) throws DisciTrackException {
         if (input.isEmpty()) {
             throw new DisciTrackException("UHOH! The activity of a deadline cannot be empty!");
         }
@@ -176,7 +163,7 @@ public class Parser {
         }
 
         try {
-            return new Deadlines(activity, LocalDate.parse(time));
+            return new Deadline(activity, LocalDate.parse(time));
         } catch (DateTimeParseException e) {
             throw new DisciTrackException("UHOH! Please enter the deadline date in yyyy-MM-dd format!");
         }
@@ -185,48 +172,52 @@ public class Parser {
     /**
      * Parses an event command into an event task.
      *
-     * @param command the full event command.
+     * @param input the event details entered by the user.
      * @return the event task described by the command.
      * @throws DisciTrackException if the activity, /from keyword, /to keyword, or dates are invalid.
      */
-    private static Events parseEvent(String command) throws DisciTrackException {
-        String input = command.substring(5).trim();
-
+    private static Event parseEvent(String input) throws DisciTrackException {
         if (input.isEmpty()) {
             throw new DisciTrackException("UHOH! The activity of an event cannot be empty!");
         }
 
-        String[] fromSplit = input.split("\\s+/from\\s+", 2);
+        String[] eventAndDates = splitEventDetails(input, "/from");
+        String[] startAndEndDates = splitEventDetails(eventAndDates[1], "/to");
+        String activity = eventAndDates[0].trim();
+        String startDate = startAndEndDates[0].trim();
+        String endDate = startAndEndDates[1].trim();
 
-        if (fromSplit.length < 2) {
+        validateEventDetails(activity, startDate, endDate);
+        return createEvent(activity, startDate, endDate);
+    }
+
+    private static String[] splitEventDetails(String input, String separator) throws DisciTrackException {
+        String[] parts = input.split("\\s+" + separator + "\\s+", 2);
+        if (parts.length < 2) {
             throw new DisciTrackException("UHOH! An event needs both /from and /to!");
         }
+        return parts;
+    }
 
-        String activity = fromSplit[0].trim();
-
-        String[] toSplit = fromSplit[1].split("\\s+/to\\s+", 2);
-
-        if (toSplit.length < 2) {
-            throw new DisciTrackException("UHOH! An event needs both /from and /to!");
-        }
-
-        String from = toSplit[0].trim();
-        String to = toSplit[1].trim();
-
+    private static void validateEventDetails(String activity, String startDate, String endDate)
+            throws DisciTrackException {
         if (activity.isEmpty()) {
             throw new DisciTrackException("UHOH! The activity of an event cannot be empty!");
         }
 
-        if (from.isEmpty()) {
+        if (startDate.isEmpty()) {
             throw new DisciTrackException("UHOH! The start time of an event cannot be empty!");
         }
 
-        if (to.isEmpty()) {
+        if (endDate.isEmpty()) {
             throw new DisciTrackException("UHOH! The end time of an event cannot be empty!");
         }
+    }
 
+    private static Event createEvent(String activity, String startDate, String endDate)
+            throws DisciTrackException {
         try {
-            return new Events(activity, LocalDate.parse(from), LocalDate.parse(to));
+            return new Event(activity, LocalDate.parse(startDate), LocalDate.parse(endDate));
         } catch (DateTimeParseException e) {
             throw new DisciTrackException("UHOH! Please enter event dates in yyyy-MM-dd format!");
         }
