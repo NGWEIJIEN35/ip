@@ -62,17 +62,8 @@ public class DisciTrack {
         while (true) {
             String command = ui.readCommand();
 
-            try {
-                Command parsedCommand = Parser.parse(command);
-                parsedCommand.execute(tasks, ui, storage);
-
-                if (parsedCommand.isExit()) {
-                    break;
-                }
-            } catch (DisciTrackException e) {
-                ui.showError(e.getMessage());
-            } catch (IOException e) {
-                ui.showSaveError();
+            if (executeCommand(command)) {
+                break;
             }
         }
     }
@@ -93,18 +84,23 @@ public class DisciTrack {
      * @return the response produced after processing the command.
      */
     public String getResponse(String input) {
-        shouldExit = false;
+        shouldExit = executeCommand(input);
+
+        return ui.getLastResponse();
+    }
+
+    private boolean executeCommand(String input) {
         try {
             Command parsedCommand = Parser.parse(input);
             parsedCommand.execute(tasks, ui, storage);
-            shouldExit = parsedCommand.isExit();
+            return parsedCommand.isExit();
         } catch (DisciTrackException e) {
             ui.showError(e.getMessage());
         } catch (IOException e) {
             ui.showSaveError();
         }
 
-        return ui.getLastResponse();
+        return false;
     }
 
     /**

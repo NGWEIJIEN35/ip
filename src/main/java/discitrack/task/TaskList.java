@@ -35,6 +35,9 @@ public class TaskList {
      * @param task the task to add.
      */
     public void add(Task task) {
+        assert task != null
+                : "A task list must not contain a null task.";
+
         tasks.add(task);
     }
 
@@ -89,13 +92,13 @@ public class TaskList {
     public List<Task> findTasksByDate(LocalDate date) {
         return tasks.stream()
                 .filter(task -> {
-                    if (task instanceof Deadlines) {
-                        Deadlines deadline = (Deadlines) task;
+                    if (task instanceof Deadline) {
+                        Deadline deadline = (Deadline) task;
                         return deadline.getTime().equals(date);
                     }
 
-                    if (task instanceof Events) {
-                        Events event = (Events) task;
+                    if (task instanceof Event) {
+                        Event event = (Event) task;
                         return !date.isBefore(event.getFrom()) && !date.isAfter(event.getTo());
                     }
                     return false;
