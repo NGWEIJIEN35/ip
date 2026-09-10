@@ -25,6 +25,10 @@ public class Ui {
             + "find KEYWORD\n  Example: find exercise\n\n"
             + "checkdate yyyy-MM-dd\n  Shows deadlines and events occurring on that date.\n"
             + "  Example: checkdate 2026-09-10\n\n"
+            + "/tag TAG\n  Optional: append to any new task; repeat for more tags.\n"
+            + "  Example: todo slides /tag CS2103T /tag school\n\n"
+            + "tag NUMBER TAG\n  Example: tag 2 school\n\n"
+            + "untag NUMBER TAG\n  Example: untag 2 school\n\n"
             + "help\n  Shows this command guide.\n\n"
             + "bye\n  Ends the conversation.";
 
@@ -134,16 +138,13 @@ public class Ui {
      * Displays tasks that match a searched date.
      *
      * @param tasksMatchedDate tasks that match the searched date.
+     * @param allTasks the full task list used for numbering.
      */
-    public void showDateMatches(List<Task> tasksMatchedDate) {
+    public void showDateMatches(List<Task> tasksMatchedDate, List<Task> allTasks) {
         if (tasksMatchedDate.isEmpty()) {
             showResponse("There are no deadlines or events on this date.");
         } else {
-            StringBuilder response = new StringBuilder("Here are your tasks for this date:\n");
-            for (Task task : tasksMatchedDate) {
-                response.append(task).append(System.lineSeparator());
-            }
-            showResponse(response.toString().stripTrailing());
+            showResponse("Here are your tasks for this date:", formatNumberedTasks(tasksMatchedDate, allTasks));
         }
     }
 
@@ -151,14 +152,15 @@ public class Ui {
      * Displays tasks that match a searched keyword.
      *
      * @param matchingTasks tasks that match the searched keyword.
+     * @param allTasks the full task list used for numbering.
      */
-    public void showFoundTasks(List<Task> matchingTasks) {
+    public void showFoundTasks(List<Task> matchingTasks, List<Task> allTasks) {
         if (matchingTasks.isEmpty()) {
             showResponse("There are no matching tasks in your list.");
         } else {
             showResponse(
                     "Here are the matching tasks in your list:",
-                    formatNumberedTasks(matchingTasks));
+                    formatNumberedTasks(matchingTasks, allTasks));
         }
     }
 
@@ -202,6 +204,31 @@ public class Ui {
     }
 
     /**
+     * Displays a successfully saved tag change and the updated task.
+     *
+     * @param number the full-list task number.
+     * @param tag the stored spelling of the tag.
+     * @param task the updated task.
+     * @param isRemoval whether the tag was removed.
+     */
+    public void showTagChanged(int number, String tag, Task task, boolean isRemoval) {
+        String message = isRemoval ? "Removed tag \"%s\" from task %d:" : "Added tag \"%s\" to task %d:";
+        showResponse(String.format(message, tag, number), task.toString());
+    }
+
+    /**
+     * Explains why a tagging command made no change.
+     *
+     * @param number the full-list task number.
+     * @param tag the tag spelling to display.
+     * @param isPresent whether the task already has the tag.
+     */
+    public void showTagUnchanged(int number, String tag, boolean isPresent) {
+        String message = isPresent ? "Task %d already has tag \"%s\"." : "Task %d does not have tag \"%s\".";
+        showResponse(String.format(message, number, tag));
+    }
+
+    /**
      * Displays an error message for a failed save operation.
      */
     public void showSaveError() {
@@ -227,9 +254,14 @@ public class Ui {
     }
 
     private static String formatNumberedTasks(List<Task> tasks) {
+        return formatNumberedTasks(tasks, tasks);
+    }
+
+    private static String formatNumberedTasks(List<Task> tasks, List<Task> allTasks) {
         StringBuilder response = new StringBuilder();
         for (int i = 0; i < tasks.size(); i++) {
-            response.append(i + 1).append(". ").append(tasks.get(i));
+            int taskNumber = allTasks.indexOf(tasks.get(i)) + 1;
+            response.append(taskNumber).append(". ").append(tasks.get(i));
             if (i < tasks.size() - 1) {
                 response.append(System.lineSeparator());
             }

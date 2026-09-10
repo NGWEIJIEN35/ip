@@ -2,6 +2,10 @@ package discitrack.parser;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import discitrack.command.AddCommand;
 import discitrack.command.ByeCommand;
@@ -12,16 +16,21 @@ import discitrack.command.FindCommand;
 import discitrack.command.HelpCommand;
 import discitrack.command.ListCommand;
 import discitrack.command.MarkCommand;
+import discitrack.command.TagCommand;
 import discitrack.command.UnmarkCommand;
+import discitrack.command.UntagCommand;
 import discitrack.exception.DisciTrackException;
 import discitrack.task.Deadline;
 import discitrack.task.Event;
+import discitrack.task.Task;
 import discitrack.task.Todo;
 
 /**
  * Parses user input into executable commands.
  */
 public class Parser {
+    private static final Pattern TAG_MARKER = Pattern.compile("(?<!\\S)/tag(?=\\s|$)");
+    private static final String TAG_ORDER_ERROR = "UHOH! Put tags at the end using /tag TAG for each tag.";
     /**
      * Parses the full user command into the corresponding command object.
      *
@@ -52,17 +61,68 @@ public class Parser {
             return new CheckDateCommand(parseCheckDate(arguments));
         } else if (commandWord.equals("find")) {
             return new FindCommand(parseFindKeyword(arguments));
-        } else if (commandWord.equals("todo")) {
-            return new AddCommand(parseTodo(arguments));
-        } else if (commandWord.equals("deadline")) {
-            return new AddCommand(parseDeadline(arguments));
-        } else if (commandWord.equals("event")) {
-            return new AddCommand(parseEvent(arguments));
+        } else if (commandWord.equals("tag") || commandWord.equals("untag")) {
+            return parseTagCommand(commandWord, arguments);
+        } else if (commandWord.equals("todo") || commandWord.equals("deadline") || commandWord.equals("event")) {
+            return parseAddCommand(commandWord, arguments);
         } else if (commandWord.equals("delete")) {
             return new DeleteCommand(parseTaskNumber(arguments));
         } else {
             throw new DisciTrackException("UHOH, I didn't know what you mean.");
         }
+    }
+
+    private static Command parseTagCommand(String commandWord, String arguments) throws DisciTrackException {
+        String[] parts = arguments.split("\\s+");
+        if (parts.length != 2) {
+            throw new DisciTrackException("UHOH! Use: " + commandWord + " NUMBER TAG");
+        }
+        int number = parseTaskNumber(parts[0]);
+        // Tag validation occurs after resolving the task number during execution.
+        return commandWord.equals("tag") ? new TagCommand(number, parts[1]) : new UntagCommand(number, parts[1]);
+    }
+
+    private static AddCommand parseAddCommand(String commandWord, String arguments) throws DisciTrackException {
+        Matcher marker = TAG_MARKER.matcher(arguments);
+        List<String> tags = new ArrayList<>();
+        String details = arguments;
+        if (marker.find()) {
+            details = arguments.substring(0, marker.start()).trim();
+            tags = parseCreationTags(arguments.substring(marker.start()));
+        }
+        Task task;
+        if (commandWord.equals("todo")) {
+            task = parseTodo(details);
+        } else if (commandWord.equals("deadline")) {
+            task = parseDeadline(details);
+        } else {
+            task = parseEvent(details);
+        }
+        task.replaceTags(tags);
+        return new AddCommand(task);
+    }
+
+    private static List<String> parseCreationTags(String suffix) throws DisciTrackException {
+        String[] tokens = suffix.split("\\s+");
+        List<String> tags = new ArrayList<>();
+        for (int i = 0; i < tokens.length; i += 2) {
+            if (!tokens[i].equals("/tag")) {
+                throw new DisciTrackException(TAG_ORDER_ERROR);
+            }
+            if (i + 1 == tokens.length || tokens[i + 1].equals("/tag")) {
+                throw new DisciTrackException("UHOH! Each /tag must be followed by one tag name.");
+            }
+            if (tokens[i + 1].equals("/by") || tokens[i + 1].equals("/from") || tokens[i + 1].equals("/to")) {
+                throw new DisciTrackException(TAG_ORDER_ERROR);
+            }
+            tags.add(tokens[i + 1]);
+        }
+        try {
+            tags.forEach(Task::validateTag);
+        } catch (IllegalArgumentException e) {
+            throw new DisciTrackException(e.getMessage());
+        }
+        return tags;
     }
 
     /**

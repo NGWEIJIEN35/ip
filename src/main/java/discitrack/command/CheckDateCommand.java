@@ -30,6 +30,6 @@ public class CheckDateCommand extends Command {
      */
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) {
-        ui.showDateMatches(tasks.findTasksByDate(date));
+        ui.showDateMatches(tasks.findTasksByDate(date), tasks.asList());
     }
 }
