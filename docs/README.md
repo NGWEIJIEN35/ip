@@ -9,9 +9,9 @@ deadlines, and events, then keeps you moving as you complete them.
 
 1. Open DisciTrack. Your saved tasks appear automatically.
 2. Type a command in the box at the bottom and press **Enter** or click **Send**.
-3. Start with `todo Review lecture notes` to add a task.
+3. Use `todo DESCRIPTION` to add a task, replacing `DESCRIPTION` with what you need to do.
 4. Click **View tasks** or type `list` to see the full task board.
-5. Use the buttons beside a task, or type commands such as `mark 1` and `delete 1`.
+5. Use the buttons below a task, or type commands such as `mark 1` and `delete 1`.
 
 Click **Commands** at any time to see command examples inside the app.
 
@@ -123,7 +123,8 @@ Search results retain their numbers from the full task list. For example, result
 ## Understanding task numbers
 
 Task numbers are their current positions in the full list; they are not permanent IDs. Deleting a task shifts
-the numbers after it. Check the current numbers with **View tasks** or `list` before changing a task.
+the numbers after it. Check the current numbers with **View tasks** or `list` before changing a task. You can also
+use the search bar or `find KEYWORD` to locate a specific task and see its full-list number.
 
 Commands that change tasks accept one number at a time. For example, `mark 1 2` marks neither task and shows
 the correct format.
@@ -159,7 +160,7 @@ data. Repair the indicated line and restart the app; `help` and `bye` remain ava
 
 ## Command constraints at a glance
 
-- Descriptions cannot contain line breaks or the storage separator ` | `.
+- Descriptions cannot contain line breaks or the storage separator consisting of a pipe surrounded by spaces.
 - Use `/by`, `/from`, and `/to` exactly once in their respective commands.
 - Put every `/tag TAG` pair after the description and any date fields.
 - Marking an already completed task or unmarking an incomplete task makes no change.
