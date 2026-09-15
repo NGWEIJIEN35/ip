@@ -120,7 +120,8 @@ E | 0 | meeting | 2026-10-01 | 2026-10-02 | tags=project
 
 Mixed old and new records are supported. Loading alone does not rewrite the file, and existing descriptions
 containing `/tag` stay literal. Older app versions may discard tags when saving; use the updated app to retain them.
-The existing limitation on using the ` | ` field separator inside descriptions remains.
+Descriptions containing the ` | ` field separator or line breaks are rejected before saving. Use a comma or dash
+instead. Empty saved descriptions, invalid saved dates, and reversed event ranges block loading with a line-specific error.
 
 Malformed tag fields stop the entire load and report the line, for example:
 
@@ -137,11 +138,22 @@ For example, `tags=`, `tags=school,`, and `tags=#school` are invalid. Valid dupl
 first spelling. Removing a task's last tag removes its optional tag field on the next successful save.
 
 Saving writes a temporary file beside the data file and atomically replaces the destination. If saving fails for
-`tag`, `untag`, or creating a tagged task, the original file and in-memory state are retained:
+any task change (add, mark, unmark, delete, tag, or untag), the original file and in-memory state are retained:
 
 ```text
-UHOH! I could not save your tasks. No changes were made.
+UHOH! I could not save your tasks. No changes were made. Check that the data folder is writable and has free space, then try again.
 ```
 
 This requires a file system that supports atomic replacement. There is no fallback that overwrites the file
-in place. Other existing commands retain their previous in-memory behaviour when a save fails.
+in place. Permission and unsupported-atomic-replacement errors provide more specific recovery advice.
+
+### Input errors and correction
+
+Commands accept extra spaces and tabs between arguments. `list`, `help`, and `bye` take no arguments.
+`mark`, `unmark`, and `delete` accept one task number; an input such as `mark 1 2` changes neither task.
+Repeated `/by`, `/from`, or `/to` parameters are rejected; repeated trailing `/tag` parameters remain supported.
+Events may start and end on the same day, but cannot end before they start. Past dates and duplicate tasks are allowed.
+
+An invalid Add-task form stays open with the original fields and an error message. Invalid typed commands and
+inline tag input remain available for correction. Marking a completed task, or unmarking an incomplete task,
+reports that no change is needed and does not save again.

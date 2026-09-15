@@ -3,6 +3,7 @@ package discitrack.command;
 import java.io.IOException;
 
 import discitrack.exception.DisciTrackException;
+import discitrack.exception.SaveException;
 import discitrack.storage.Storage;
 import discitrack.task.Task;
 import discitrack.task.TaskList;
@@ -31,7 +32,7 @@ public class AddCommand extends Command {
      * @param ui the UI used to show the result.
      * @param storage the storage used to save the updated list.
      * @throws IOException if saving the updated list fails.
-     * @throws DisciTrackException if a tagged task is rolled back after a failed save.
+     * @throws DisciTrackException if a task is rolled back after a failed save.
      */
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) throws IOException, DisciTrackException {
@@ -45,11 +46,8 @@ public class AddCommand extends Command {
         try {
             storage.save(tasks.asList());
         } catch (IOException e) {
-            if (!task.getTags().isEmpty()) {
-                tasks.delete(tasks.size());
-                throw new DisciTrackException("UHOH! I could not save your tasks. No changes were made.");
-            }
-            throw e;
+            tasks.delete(tasks.size());
+            throw new SaveException(e);
         }
         ui.showTaskAdded(task, tasks.size());
     }

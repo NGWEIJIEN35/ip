@@ -10,6 +10,7 @@ import discitrack.task.Task;
 import javafx.animation.PauseTransition;
 import javafx.animation.ScaleTransition;
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
@@ -25,6 +26,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
 
@@ -51,6 +53,8 @@ public class MainWindow {
     @FXML
     private Button sendButton;
     @FXML
+    private Button clearCommandButton;
+    @FXML
     private TextField searchInput;
 
     private DisciTrack disciTrack;
@@ -66,7 +70,8 @@ public class MainWindow {
      */
     public void setDisciTrack(DisciTrack disciTrack) {
         this.disciTrack = disciTrack;
-        showResponse("Coach is in!", disciTrack.getGreeting(), disciTrack.hasLoadError(), false);
+        showResponse(disciTrack.hasLoadError() ? "Saved data needs attention" : "Coach is in!",
+                disciTrack.getGreeting(), disciTrack.hasLoadError(), false);
         if (!disciTrack.hasLoadError() && disciTrack.getTasks().isEmpty()) {
             coachMessage.setText("Zero tasks. Maximum breathing room. Enjoy it, champ!");
             celebrate();
@@ -78,6 +83,8 @@ public class MainWindow {
     @FXML
     private void initialize() {
         sendButton.disableProperty().bind(userInput.textProperty().isEmpty());
+        clearCommandButton.visibleProperty().bind(userInput.textProperty().isNotEmpty());
+        clearCommandButton.managedProperty().bind(clearCommandButton.visibleProperty());
         root.widthProperty().addListener((observable, previous, width) -> resizeCoach(width.doubleValue()));
         root.heightProperty().addListener((observable, previous, height) ->
                 coachImage.setFitHeight(Math.max(70, Math.min(330, height.doubleValue() - 450))));
@@ -98,29 +105,48 @@ public class MainWindow {
     }
 
     @FXML
+    private void handleClearCommand() {
+        userInput.clear();
+        userInput.requestFocus();
+    }
+
+    @FXML
     private void handleUserInput() {
         String input = userInput.getText().trim();
         if (!input.isEmpty()) {
-            runCommand(input);
-            userInput.clear();
+            if (runCommand(input)) {
+                userInput.clear();
+            }
         }
     }
 
     /**
      * Executes one action and refreshes the board only from the application's task state.
      */
-    private void runCommand(String input) {
+    private boolean runCommand(String input) {
+        return runCommand(input, false);
+    }
+
+    private boolean runCommand(String input, boolean keepEditorOnError) {
         if (disciTrack == null || disciTrack.shouldExit()) {
-            return;
+            return false;
         }
+        long completedBefore = disciTrack.getTasks().stream().filter(Task::isDone).count();
         String response = disciTrack.getResponse(input);
+        boolean didComplete = disciTrack.getTasks().stream().filter(Task::isDone).count() > completedBefore;
         String command = input.split("\\s+", 2)[0];
         boolean hasError = disciTrack.hasResponseError();
         selectTaskView(command, input, hasError);
+        if (hasError && !keepEditorOnError) {
+            taskContainer.setVisible(false);
+            taskContainer.setManaged(false);
+            searchKeyword = "";
+            searchInput.clear();
+        }
         if (!hasError && command.equals("find")) {
             searchKeyword = input.substring(command.length()).trim();
             searchInput.setText(searchKeyword);
-        } else {
+        } else if (!hasError) {
             searchKeyword = "";
             searchInput.clear();
         }
@@ -133,6 +159,10 @@ public class MainWindow {
         dialogContainer.getChildren().add(commandRow);
         String title = getHeading(command, hasError);
         coachMessage.setText(getEncouragement(command, hasError));
+        if (!hasError && command.equals("mark") && !didComplete) {
+            title = "Already completed";
+            coachMessage.setText("That win is already counted, champ. Pick your next challenge!");
+        }
         String body = response.replaceAll("(\\R){2,}", "\n");
         if (!hasError && command.equals("list")) {
             body = disciTrack.getTasks().isEmpty()
@@ -145,11 +175,13 @@ public class MainWindow {
         } else if (!hasError && command.equals("help")) {
             body = "The playbook is open. Pick your move, champ!";
         }
-        showResponse(title, body, hasError, command.equals("mark") && !hasError);
-        refreshTasks();
+        showResponse(title, body, hasError, didComplete);
+        if (!hasError) {
+            refreshTasks();
+        }
         Platform.runLater(() -> scrollToCommand(commandRow));
         userInput.requestFocus();
-        if (!hasError && command.equals("mark")) {
+        if (!hasError && didComplete) {
             celebrate();
         } else if (!hasError && disciTrack.getTasks().isEmpty()
                 && (command.equals("list") || command.equals("delete"))) {
@@ -164,6 +196,7 @@ public class MainWindow {
             delay.setOnFinished(event -> Platform.exit());
             delay.play();
         }
+        return !hasError;
     }
 
     /**
@@ -182,6 +215,9 @@ public class MainWindow {
      * Limits the board to the current command's result while retaining original task numbers.
      */
     private void selectTaskView(String command, String input, boolean hasError) {
+        if (hasError) {
+            return;
+        }
         visibleTasks = List.of();
         boardHeading = "Updated task";
         boolean isBoardVisible = !hasError;
@@ -258,6 +294,9 @@ public class MainWindow {
 
     private String getEncouragement(String command, boolean hasError) {
         if (hasError) {
+            if (disciTrack.hasStorageError()) {
+                return "Your data needs attention. Follow the file recovery advice in the error message, champ.";
+            }
             return "Check the input and try again, champ. You've got this!";
         }
         if (disciTrack.getTasks().isEmpty() && !command.equals("bye")) {
@@ -359,14 +398,14 @@ public class MainWindow {
             tags.getItems().addAll(task.getTags());
             tags.getSelectionModel().selectFirst();
             tags.setMaxWidth(Double.MAX_VALUE);
-            submit.setOnAction(event -> runCommand("untag " + taskNumber + " " + tags.getValue()));
+            submit.setOnAction(event -> runCommand("untag " + taskNumber + " " + tags.getValue(), true));
             editor.getChildren().add(tags);
         } else {
             TextField name = new TextField();
             name.setId("tagInput");
             name.setPromptText("Tag name, e.g. school");
             submit.disableProperty().bind(name.textProperty().isEmpty());
-            submit.setOnAction(event -> runCommand("tag " + taskNumber + " " + name.getText().trim()));
+            submit.setOnAction(event -> runCommand("tag " + taskNumber + " " + name.getText().trim(), true));
             name.setOnAction(event -> submit.fire());
             editor.getChildren().add(name);
             Platform.runLater(name::requestFocus);
@@ -414,13 +453,16 @@ public class MainWindow {
         dialog.setTitle("Add a task");
         dialog.setHeaderText("Put your next win on the board.");
         ComboBox<String> type = new ComboBox<>();
+        type.setId("taskType");
         type.getItems().addAll("todo", "deadline", "event");
         type.setValue("todo");
         TextField description = new TextField();
+        description.setId("taskDescription");
         description.setPromptText("e.g. Review lecture notes");
         TextField from = new TextField();
         from.setPromptText("yyyy-MM-dd");
         TextField until = new TextField();
+        until.setId("taskDate");
         until.setPromptText("yyyy-MM-dd");
         Label fromLabel = label("From (events)", "muted");
         Label untilLabel = label("Due / end date", "muted");
@@ -433,20 +475,30 @@ public class MainWindow {
         styleDialog(dialog);
         ButtonType add = new ButtonType("Add task", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(add, ButtonType.CANCEL);
-        dialog.getDialogPane().lookupButton(add).disableProperty().bind(description.textProperty().isEmpty());
-        dialog.setResultConverter(button -> {
-            if (button != add) {
-                return null;
-            }
+        Label error = label("", "form-error");
+        error.setMinHeight(Region.USE_PREF_SIZE);
+        error.setMaxWidth(Double.MAX_VALUE);
+        error.setVisible(false);
+        error.setManaged(false);
+        fields.getChildren().add(error);
+        dialog.getDialogPane().lookupButton(add).addEventFilter(ActionEvent.ACTION, event -> {
+            event.consume();
             String command = type.getValue() + " " + description.getText().trim();
             if (type.getValue().equals("deadline")) {
                 command += " /by " + until.getText().trim();
             } else if (type.getValue().equals("event")) {
                 command += " /from " + from.getText().trim() + " /to " + until.getText().trim();
             }
-            return command;
+            if (runCommand(command)) {
+                dialog.close();
+            } else {
+                error.setText(disciTrack.getLastResponse());
+                error.setVisible(true);
+                error.setManaged(true);
+                dialog.getDialogPane().getScene().getWindow().sizeToScene();
+            }
         });
-        dialog.showAndWait().ifPresent(this::runCommand);
+        dialog.showAndWait();
     }
 
     private void showCommandGuide(String text) {

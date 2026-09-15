@@ -3,6 +3,7 @@ package discitrack.command;
 import java.io.IOException;
 
 import discitrack.exception.DisciTrackException;
+import discitrack.exception.SaveException;
 import discitrack.storage.Storage;
 import discitrack.task.Task;
 import discitrack.task.TaskList;
@@ -35,8 +36,17 @@ public class UnmarkCommand extends Command {
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) throws DisciTrackException, IOException {
         Task task = tasks.get(taskNumber);
+        if (!task.isDone()) {
+            ui.showError("Task " + taskNumber + " is already not done, champ! No changes were needed.");
+            return;
+        }
         task.markAsUndone();
-        storage.save(tasks.asList());
+        try {
+            storage.save(tasks.asList());
+        } catch (IOException e) {
+            task.markAsDone();
+            throw new SaveException(e);
+        }
         ui.showTaskUnmarked(task);
     }
 }

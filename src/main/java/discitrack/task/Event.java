@@ -19,6 +19,9 @@ public class Event extends Task {
      */
     public Event(String activity, LocalDate from, LocalDate to) {
         super(activity);
+        if (to.isBefore(from)) {
+            throw new IllegalArgumentException("UHOH! The end date cannot be before the start date.");
+        }
         this.from = from;
         this.to = to;
     }

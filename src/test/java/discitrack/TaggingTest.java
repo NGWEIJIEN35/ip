@@ -99,7 +99,7 @@ public class TaggingTest {
             {"deadline report /tag school /by 2026-10-01",
                 "UHOH! Put tags at the end using /tag TAG for each tag."},
             {"todo sleep /tag good /tag #bad", Task.INVALID_TAG_MESSAGE},
-            {"todo /tag school", "OOPSIE! What's the task? Try: todo exercise"}
+            {"todo /tag school", "OOPSIE! Add a description after todo. Example: todo exercise."}
         };
         for (String[] entry : cases) {
             assertEquals(entry[1], app.getResponse(entry[0]), entry[0]);

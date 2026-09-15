@@ -45,7 +45,8 @@ Use a disposable working directory/data file or back up and restore your existin
 
 JUnit injects a deterministic atomic-replacement failure after a temporary file has been written. This checks both
 disk preservation and in-memory rollback without depending on OS-specific permission settings. No non-atomic
-replacement fallback is permitted. Existing commands without tagging retain their prior in-memory failure behaviour.
+replacement fallback is permitted. All modifying commands restore their in-memory state after a failed save;
+see [More error handling](more-error-handling.md) for the additional failure and input checks.
 
 Run the same Gradle checks in CI on Ubuntu, macOS, and Windows. Local success alone does not establish that all
 three CI jobs have passed. GUI appearance and real file-system restrictions remain manual/environment checks.

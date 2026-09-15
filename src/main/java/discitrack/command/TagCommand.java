@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.List;
 
 import discitrack.exception.DisciTrackException;
+import discitrack.exception.SaveException;
 import discitrack.storage.Storage;
 import discitrack.task.Task;
 import discitrack.task.TaskList;
@@ -68,7 +69,7 @@ public class TagCommand extends Command {
             storage.save(tasks.asList());
         } catch (IOException e) {
             task.replaceTags(originalTags);
-            throw new DisciTrackException("UHOH! I could not save your tasks. No changes were made.");
+            throw new SaveException(e);
         }
         ui.showTagChanged(taskNumber, isRemoval ? existing : tag, task, isRemoval);
     }

@@ -7,6 +7,7 @@ import java.util.List;
 
 import discitrack.command.Command;
 import discitrack.exception.DisciTrackException;
+import discitrack.exception.SaveException;
 import discitrack.parser.Parser;
 import discitrack.storage.Storage;
 import discitrack.task.Task;
@@ -26,6 +27,7 @@ public class DisciTrack {
     private boolean shouldExit;
     private String loadError;
     private boolean hasResponseError;
+    private boolean hasStorageError;
 
     /**
      * Creates a DisciTrack application for use by the graphical user interface.
@@ -47,6 +49,14 @@ public class DisciTrack {
         ui = new Ui(shouldPrintResponses);
         storage = new Storage(filePath);
         tasks = new TaskList(loadTasks());
+    }
+
+    public boolean hasStorageError() {
+        return hasStorageError || loadError != null;
+    }
+
+    public String getLastResponse() {
+        return ui.getLastResponse();
     }
 
     /**
@@ -146,6 +156,7 @@ public class DisciTrack {
 
     private boolean executeCommand(String input) {
         hasResponseError = false;
+        hasStorageError = false;
         if (loadError != null && !input.trim().equals("help") && !input.trim().equals("bye")) {
             hasResponseError = true;
             ui.showError(LOAD_BLOCKED_MESSAGE);
@@ -157,9 +168,11 @@ public class DisciTrack {
             return parsedCommand.isExit();
         } catch (DisciTrackException e) {
             hasResponseError = true;
+            hasStorageError = e instanceof SaveException;
             ui.showError(e.getMessage());
         } catch (IOException e) {
             hasResponseError = true;
+            hasStorageError = true;
             ui.showSaveError();
         }
 

@@ -12,6 +12,9 @@
 .input-area { -fx-padding: 14 0 0 0; }
 .text-field, .combo-box { -fx-background-color: white; -fx-border-color: #c8d4cd; -fx-border-radius: 9; -fx-background-radius: 9; -fx-padding: 10; }
 .text-field:focused { -fx-border-color: #238268; }
+.command-input { -fx-padding: 10 44 10 10; }
+.button.clear-command-button { -fx-background-color: transparent; -fx-text-fill: #536e62; -fx-padding: 0; -fx-font-size: 20px; -fx-font-weight: normal; }
+.button.clear-command-button:hover { -fx-background-color: #e5ebe7; -fx-text-fill: #174f43; }
 .button { -fx-background-color: #19644f; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 9; -fx-padding: 11 18; -fx-cursor: hand; }
 .button:hover { -fx-background-color: #267e64; }
 .button:focused { -fx-border-color: #ae8624; -fx-border-radius: 9; }
@@ -35,3 +38,7 @@
 .task-actions .button { -fx-padding: 8 13; }
 .delete-button { -fx-background-color: #faeae3; -fx-text-fill: #963f26; }
 .delete-button:hover { -fx-background-color: #f1d2c4; }
+.form-error {
+    -fx-text-fill: #a63620;
+    -fx-font-weight: bold;
+}

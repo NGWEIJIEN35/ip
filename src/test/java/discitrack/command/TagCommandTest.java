@@ -45,7 +45,7 @@ public class TagCommandTest {
             Command command = Parser.parse(input);
             DisciTrackException error = assertThrows(DisciTrackException.class, () ->
                     command.execute(tasks, ui, storage));
-            assertEquals("UHOH! I could not save your tasks. No changes were made.", error.getMessage());
+            assertTrue(error.getMessage().startsWith("UHOH! I could not save your tasks. No changes were made."));
             assertEquals(List.of("School", "CS2103T", "urgent"), task.getTags());
             assertEquals("slides", task.getActivity());
             assertTrue(task.isDone());

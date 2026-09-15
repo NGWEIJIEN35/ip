@@ -3,6 +3,7 @@ package discitrack.command;
 import java.io.IOException;
 
 import discitrack.exception.DisciTrackException;
+import discitrack.exception.SaveException;
 import discitrack.storage.Storage;
 import discitrack.task.Task;
 import discitrack.task.TaskList;
@@ -35,7 +36,12 @@ public class DeleteCommand extends Command {
     @Override
     public void execute(TaskList tasks, Ui ui, Storage storage) throws DisciTrackException, IOException {
         Task removedTask = tasks.delete(taskNumber);
-        storage.save(tasks.asList());
+        try {
+            storage.save(tasks.asList());
+        } catch (IOException e) {
+            tasks.asList().add(taskNumber - 1, removedTask);
+            throw new SaveException(e);
+        }
         ui.showTaskDeleted(removedTask, tasks.size());
     }
 }

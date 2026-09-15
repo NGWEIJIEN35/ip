@@ -43,9 +43,18 @@ public class Parser {
                 : "A command must be provided before parsing.";
 
         String command = fullCommand.trim();
-        String[] commandParts = command.split(" ", 2);
+        String[] commandParts = command.split("\\s+", 2);
         String commandWord = commandParts[0];
         String arguments = commandParts.length > 1 ? commandParts[1].trim() : "";
+
+        if (List.of("bye", "help", "list").contains(commandWord) && !arguments.isEmpty()) {
+            throw new DisciTrackException("UHOH! " + commandWord + " takes no arguments. Use: " + commandWord);
+        }
+        if (List.of("mark", "unmark", "delete").contains(commandWord)
+                && arguments.split("\\s+").length > 1) {
+            throw new DisciTrackException("UHOH! Change one task at a time. No tasks were changed. Use: "
+                    + commandWord + " NUMBER");
+        }
 
         if (commandWord.equals("bye")) {
             return new ByeCommand();
@@ -92,12 +101,16 @@ public class Parser {
             tags = parseCreationTags(arguments.substring(marker.start()));
         }
         Task task;
-        if (commandWord.equals("todo")) {
-            task = parseTodo(details);
-        } else if (commandWord.equals("deadline")) {
-            task = parseDeadline(details);
-        } else {
-            task = parseEvent(details);
+        try {
+            if (commandWord.equals("todo")) {
+                task = parseTodo(details);
+            } else if (commandWord.equals("deadline")) {
+                task = parseDeadline(details);
+            } else {
+                task = parseEvent(details);
+            }
+        } catch (IllegalArgumentException e) {
+            throw new DisciTrackException(e.getMessage());
         }
         task.replaceTags(tags);
         return new AddCommand(task);
@@ -189,7 +202,7 @@ public class Parser {
      */
     private static Todo parseTodo(String activity) throws DisciTrackException {
         if (activity.isEmpty()) {
-            throw new DisciTrackException("OOPSIE! What's the task? Try: todo exercise");
+            throw new DisciTrackException("OOPSIE! Add a description after todo. Example: todo exercise.");
         }
 
         return new Todo(activity);
@@ -207,11 +220,7 @@ public class Parser {
             throw new DisciTrackException("OOPSIE! I need a task description. Try: deadline homework /by 2026-09-30");
         }
 
-        String[] parts = input.split("\\s+/by\\s+", 2);
-
-        if (parts.length < 2) {
-            throw new DisciTrackException("OOPSIE! Include /by and a date. Try: deadline homework /by 2026-09-30");
-        }
+        String[] parts = splitDateField(input, "/by");
 
         String activity = parts[0].trim();
         String time = parts[1].trim();
@@ -244,8 +253,11 @@ public class Parser {
             throw new DisciTrackException("OOPSIE! I need an event description before /from.");
         }
 
-        String[] eventAndDates = splitEventDetails(input, "/from");
-        String[] startAndEndDates = splitEventDetails(eventAndDates[1], "/to");
+        String[] eventAndDates = splitDateField(input, "/from");
+        if (Pattern.compile("(?<!\\S)/to(?=\\s|$)").matcher(eventAndDates[0]).find()) {
+            throw new DisciTrackException("UHOH! Put /from before /to, followed by their dates.");
+        }
+        String[] startAndEndDates = splitDateField(eventAndDates[1], "/to");
         String activity = eventAndDates[0].trim();
         String startDate = startAndEndDates[0].trim();
         String endDate = startAndEndDates[1].trim();
@@ -254,12 +266,17 @@ public class Parser {
         return createEvent(activity, startDate, endDate);
     }
 
-    private static String[] splitEventDetails(String input, String separator) throws DisciTrackException {
-        String[] parts = input.split("\\s+" + separator + "\\s+", 2);
-        if (parts.length < 2) {
-            throw new DisciTrackException("UHOH! An event needs both /from and /to!");
+    private static String[] splitDateField(String input, String separator) throws DisciTrackException {
+        Matcher marker = Pattern.compile("(?<!\\S)" + Pattern.quote(separator) + "(?=\\s|$)").matcher(input);
+        if (!marker.find()) {
+            throw new DisciTrackException("OOPSIE! Include " + separator + " followed by a date in yyyy-MM-dd format.");
         }
-        return parts;
+        int start = marker.start();
+        int end = marker.end();
+        if (marker.find()) {
+            throw new DisciTrackException("UHOH! Use " + separator + " only once. No tasks were changed.");
+        }
+        return new String[] {input.substring(0, start).trim(), input.substring(end).trim()};
     }
 
     private static void validateEventDetails(String activity, String startDate, String endDate)
@@ -279,10 +296,15 @@ public class Parser {
 
     private static Event createEvent(String activity, String startDate, String endDate)
             throws DisciTrackException {
+        return new Event(activity, parseEventDate(startDate, "start"), parseEventDate(endDate, "end"));
+    }
+
+    private static LocalDate parseEventDate(String value, String field) throws DisciTrackException {
         try {
-            return new Event(activity, LocalDate.parse(startDate), LocalDate.parse(endDate));
+            return LocalDate.parse(value);
         } catch (DateTimeParseException e) {
-            throw new DisciTrackException("UHOH! Use valid event dates in yyyy-MM-dd format, for example 2026-09-30.");
+            throw new DisciTrackException("UHOH! The event's " + field
+                    + " date is invalid. Use a real date in yyyy-MM-dd format, for example 2026-09-30.");
         }
     }
 }

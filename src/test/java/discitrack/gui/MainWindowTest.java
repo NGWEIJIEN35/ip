@@ -21,10 +21,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.WritableImage;
+import javafx.stage.Window;
 
 /**
  * Exercises the real FXML controller with isolated task data and captures layouts for review.
@@ -47,6 +49,12 @@ public class MainWindowTest {
                 controller.setDisciTrack(app);
                 TextField input = (TextField) root.lookup("#userInput");
                 Button send = (Button) root.lookup("#sendButton");
+                root.applyCss();
+                root.layout();
+                input.setText("todo");
+                send.fire();
+                assertFalse(root.lookup("#taskContainer").isVisible());
+                assertFalse(root.lookup("#taskContainer").isManaged());
                 input.setText("todo Review lecture notes");
                 send.fire();
                 assertTrue(app.getTasks().size() == 1);
@@ -64,10 +72,24 @@ public class MainWindowTest {
                 input.setText("nonsense");
                 send.fire();
                 assertTrue(app.hasResponseError());
+                assertTrue(input.getText().equals("nonsense"));
+                Button clear = (Button) root.lookup("#clearCommandButton");
+                assertTrue(clear.isVisible());
+                snapshot(root, "desk-clear-command");
+                int responseCount = root.lookupAll(".response-card").size();
+                clear.fire();
+                assertTrue(input.getText().isEmpty());
+                assertFalse(clear.isVisible());
+                assertTrue(send.isDisabled());
+                assertTrue(root.lookupAll(".response-card").size() == responseCount);
+                assertTrue(app.getTasks().size() == 1);
+                assertFalse(root.lookup("#taskContainer").isVisible());
+                assertFalse(root.lookup("#taskContainer").isManaged());
                 assertTrue(root.lookup(".error-card") != null);
                 input.setText("list");
                 send.fire();
                 assertFalse(app.hasResponseError());
+                assertTrue(root.lookup("#taskContainer").isVisible());
                 assertTrue(new DisciTrack(tempDir.resolve("tasks.txt").toString()).getTasks().size() == 1);
                 input.setText("todo Exercise");
                 send.fire();
@@ -99,6 +121,12 @@ public class MainWindowTest {
                 searchButton.fire();
                 click(root, "Tag");
                 TextField tagInput = (TextField) root.lookup("#tagInput");
+                tagInput.setText("#invalid");
+                click(root, "Add tag");
+                assertTrue(app.hasResponseError());
+                assertTrue(root.lookup("#tagInput") == tagInput);
+                assertTrue(root.lookup("#taskContainer").isVisible());
+                assertTrue(tagInput.getText().equals("#invalid"));
                 tagInput.setText("health");
                 click(root, "Add tag");
                 assertTrue(app.getTasks().get(1).getTags().contains("health"));
@@ -140,12 +168,46 @@ public class MainWindowTest {
                         .anyMatch(text -> text.contains("All clear")));
                 snapshot(root, "desk-empty");
                 assertTrue(scene.getRoot() == root);
+                verifyInvalidForm(root, app);
                 completed.complete(null);
             } catch (Throwable error) {
                 completed.completeExceptionally(error);
             }
         });
         completed.get(30, TimeUnit.SECONDS);
+    }
+
+    private void verifyInvalidForm(Parent root, DisciTrack app) {
+        CompletableFuture<Void> checked = new CompletableFuture<>();
+        Platform.runLater(() -> {
+            Window window = Window.getWindows().stream().filter(Window::isShowing).findFirst().orElseThrow();
+            Parent form = window.getScene().getRoot();
+            try {
+                ComboBox<?> type = (ComboBox<?>) form.lookup("#taskType");
+                type.getSelectionModel().select(1);
+                TextField description = (TextField) form.lookup("#taskDescription");
+                TextField date = (TextField) form.lookup("#taskDate");
+                description.setText("Keep my input");
+                date.setText("2026-02-30");
+                click(form, "Add task");
+                assertTrue(window.isShowing());
+                assertTrue(description.getText().equals("Keep my input"));
+                assertTrue(date.getText().equals("2026-02-30"));
+                assertTrue(form.lookup(".form-error").isVisible());
+                assertTrue(app.getTasks().isEmpty());
+                snapshot(form, "desk-form-error");
+                date.setText("2026-09-30");
+                click(form, "Add task");
+                assertFalse(window.isShowing());
+                assertTrue(app.getTasks().size() == 1);
+                checked.complete(null);
+            } catch (Throwable error) {
+                checked.completeExceptionally(error);
+                window.hide();
+            }
+        });
+        click(root, "+ Add task");
+        checked.join();
     }
 
     private void click(Parent root, String text) {
@@ -161,7 +223,9 @@ public class MainWindowTest {
         root.applyCss();
         root.layout();
         ScrollPane scroll = (ScrollPane) root.lookup("#scrollPane");
-        scroll.setVvalue(1);
+        if (scroll != null) {
+            scroll.setVvalue(1);
+        }
         root.layout();
         WritableImage image = root.snapshot(null, null);
         BufferedImage output = new BufferedImage((int) image.getWidth(), (int) image.getHeight(),

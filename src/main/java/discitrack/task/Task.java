@@ -22,6 +22,13 @@ public class Task {
      * @param activity the activity represented by the task.
      */
     public Task(String activity) {
+        if (activity == null || activity.isBlank()) {
+            throw new IllegalArgumentException("OOPSIE! Add a task description.");
+        }
+        if (activity.contains(" | ") || activity.matches("(?s).*\\R.*")) {
+            throw new IllegalArgumentException("UHOH! Keep the description on one line and avoid ' | '. "
+                    + "Use a comma or dash instead so your task can be saved safely.");
+        }
         this.activity = activity;
         this.isDone = false;
     }

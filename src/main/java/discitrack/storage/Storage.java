@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -108,7 +109,12 @@ public class Storage {
             } else if (!parts[1].equals("0")) {
                 throw new IllegalArgumentException("Invalid status");
             }
-        } catch (IllegalArgumentException | IndexOutOfBoundsException e) {
+        } catch (DateTimeParseException e) {
+            throw new IOException("invalid date '" + e.getParsedString() + "' on line " + lineNumber
+                    + "; use a real date in yyyy-MM-dd format", e);
+        } catch (IllegalArgumentException e) {
+            throw new IOException("invalid task data on line " + lineNumber + ": " + e.getMessage(), e);
+        } catch (IndexOutOfBoundsException e) {
             throw new IOException("invalid task data on line " + lineNumber, e);
         }
         if (parts.length > fieldCount) {
