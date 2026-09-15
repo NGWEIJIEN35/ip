@@ -10,8 +10,8 @@ import discitrack.task.Task;
  */
 public class Ui {
     private static final String LINE = "____________________________________________________________";
-    private static final String GREETING = "Hi! I'm DisciTrack, your discipline coach.\n"
-            + "What are we getting done today?\n"
+    private static final String GREETING = "I'm DisciTrack, your discipline coach.\n"
+            + "Are you ready to crush today's tasks?\n"
             + "Type help or click Commands if you need examples.";
     private static final String HELP_MESSAGE = "Here are the commands you can use:\n\n"
             + "todo DESCRIPTION\n  Example: todo exercise\n\n"
@@ -86,7 +86,7 @@ public class Ui {
      * Displays the farewell message.
      */
     public void showBye() {
-        showResponse("Bye bye! Well done today, keep it up! Hope to see you again soon!");
+        showResponse("Coach out! Rest up, champ. We'll chase the next win together.");
     }
 
     /**
@@ -103,7 +103,7 @@ public class Ui {
      */
     public void showTaskList(List<Task> tasks) {
         if (tasks.isEmpty()) {
-            showResponse("Congratulations! You have no tasks currently!");
+            showResponse("All clear, champ! Nothing on the board. Enjoy the breather - coach approves.");
         } else {
             showResponse(formatNumberedTasks(tasks));
         }
@@ -116,11 +116,11 @@ public class Ui {
      */
     public void showTaskMarked(Task task) {
         showResponse(
-                "Well done! You completed:",
+                "Task completed! You finished:",
                 "",
                 task.toString(),
                 "",
-                "Keep the momentum going! You can do it!");
+                "Another commitment kept. Be proud of yourself, champ - keep that momentum going!");
     }
 
     /**
@@ -130,7 +130,7 @@ public class Ui {
      */
     public void showTaskUnmarked(Task task) {
         showResponse(
-                "I have marked this task as not done yet, try to finish soon!",
+                "Back on the board! A little early with the victory dance? It's okay - we go again. Let's lock in!",
                 task.toString());
     }
 
@@ -156,10 +156,10 @@ public class Ui {
      */
     public void showFoundTasks(List<Task> matchingTasks, List<Task> allTasks) {
         if (matchingTasks.isEmpty()) {
-            showResponse("There are no matching tasks in your list.");
+            showResponse("Nothing on the radar, champ. Try another keyword or hit Show all.");
         } else {
             showResponse(
-                    "Here are the matching tasks in your list:",
+                    "Scouting report is in! Here's what matches:",
                     formatNumberedTasks(matchingTasks, allTasks));
         }
     }
@@ -173,12 +173,12 @@ public class Ui {
     public void showTaskAdded(Task task, int taskCount) {
         String taskWord = taskCount == 1 ? "task" : "tasks";
         showResponse(
-                "Alright! I've added this task:",
+                "Your next challenge:",
                 "",
                 task.toString(),
                 String.format("You now have %d %s.", taskCount, taskWord),
                 "",
-                "Lock in! Try to finish as soon as possible!");
+                "Planning done. Now comes the most important part: doing it!");
     }
 
     /**
@@ -189,7 +189,7 @@ public class Ui {
      */
     public void showTaskDeleted(Task removedTask, int taskCount) {
         showResponse(
-                "Alright! I have deleted this task.",
+                "Off the board! Game plan updated.",
                 removedTask.toString(),
                 String.format("Now you have %d tasks in the list.", taskCount));
     }
@@ -212,7 +212,8 @@ public class Ui {
      * @param isRemoval whether the tag was removed.
      */
     public void showTagChanged(int number, String tag, Task task, boolean isRemoval) {
-        String message = isRemoval ? "Removed tag \"%s\" from task %d:" : "Added tag \"%s\" to task %d:";
+        String message = isRemoval ? "\"%s\" badge removed from task %d. Task stays in the game."
+                : "Task %2$d is now wearing the \"%1$s\" badge!";
         showResponse(String.format(message, tag, number), task.toString());
     }
 

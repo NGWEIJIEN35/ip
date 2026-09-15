@@ -128,7 +128,7 @@ public class TaskList {
      */
     private void validateTaskNumber(int taskNumber) throws DisciTrackException {
         if (taskNumber < 1 || taskNumber > tasks.size()) {
-            throw new DisciTrackException("UHOH! Please enter a valid task number!");
+            throw new DisciTrackException("UHOH! No task has that number. Type list to check your task numbers.");
         }
     }
 }

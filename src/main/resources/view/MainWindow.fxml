@@ -12,7 +12,7 @@
     <ImageView fx:id="coachImage" fitWidth="246" fitHeight="330" preserveRatio="true">
      <image><Image url="@../images/discitrack-coach-hype.png"/></image>
     </ImageView>
-   <Label text="LET'S GOOO!" styleClass="hype-title"/>
+   <Label text="Let's gooo!" styleClass="hype-title"/>
    <Label text="Your discipline coach" styleClass="coach-caption"/>
    <Label fx:id="coachMessage" text="Big energy. One task at a time." wrapText="true" maxWidth="240"
     styleClass="coach-message"/>

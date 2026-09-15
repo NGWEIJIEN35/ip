@@ -28,14 +28,14 @@ public class TaggingTest {
     @Test
     public void createAndEditTags_validCommands_returnsExactResponses() {
         DisciTrack app = newApp();
-        String added = String.join(System.lineSeparator(), "Alright! I've added this task:", "",
+        String added = String.join(System.lineSeparator(), "Your next challenge:", "",
                 "[T] [ ] sleep [#personal]", "You now have 1 task.", "",
-                "Lock in! Try to finish as soon as possible!");
+                "Planning done. Now comes the most important part: doing it!");
         assertEquals(added, app.getResponse("todo sleep /tag personal"));
-        assertEquals("Added tag \"School\" to task 1:" + System.lineSeparator()
+        assertEquals("Task 1 is now wearing the \"School\" badge!" + System.lineSeparator()
                 + "[T] [ ] sleep [#personal] [#School]", app.getResponse("tag 1 School"));
         assertEquals("Task 1 already has tag \"School\".", app.getResponse("tag 1 SCHOOL"));
-        assertEquals("Removed tag \"School\" from task 1:" + System.lineSeparator()
+        assertEquals("\"School\" badge removed from task 1. Task stays in the game." + System.lineSeparator()
                 + "[T] [ ] sleep [#personal]", app.getResponse("untag 1 school"));
         assertEquals("Task 1 does not have tag \"urgent\".", app.getResponse("untag 1 urgent"));
     }
@@ -61,7 +61,7 @@ public class TaggingTest {
         app.getResponse("todo groceries");
         app.getResponse("todo slides /tag school");
         app.getResponse("deadline slides /by 2026-10-01 /tag project");
-        assertEquals(String.join(System.lineSeparator(), "Here are the matching tasks in your list:",
+        assertEquals(String.join(System.lineSeparator(), "Scouting report is in! Here's what matches:",
                 "2. [T] [ ] slides [#school]", "3. [D] [ ] slides (by: Oct 01 2026) [#project]"),
                 app.getResponse("find SLIDES"));
         assertTrue(app.getResponse("tag 3 urgent").contains("[D] [ ] slides"));
@@ -69,7 +69,8 @@ public class TaggingTest {
         assertEquals("Here are your tasks for this date:" + System.lineSeparator()
                 + "3. [D] [ ] slides (by: Oct 01 2026) [#project] [#urgent]",
                 app.getResponse("checkdate 2026-10-01"));
-        assertEquals("There are no matching tasks in your list.", app.getResponse("find urgent"));
+        assertEquals("Nothing on the radar, champ. Try another keyword or hit Show all.",
+                app.getResponse("find urgent"));
         app.getResponse("delete 1");
         assertTrue(app.getResponse("checkdate 2026-10-01").contains("2. [D]"));
     }
@@ -87,9 +88,9 @@ public class TaggingTest {
             {"tag 1 school urgent", "UHOH! Use: tag NUMBER TAG"},
             {"untag 1", "UHOH! Use: untag NUMBER TAG"},
             {"untag 1 school urgent", "UHOH! Use: untag NUMBER TAG"},
-            {"tag abc school", "UHOH! Please enter a valid task number!"},
-            {"tag 0 #bad", "UHOH! Please enter a valid task number!"},
-            {"tag 9 school", "UHOH! Please enter a valid task number!"},
+            {"tag abc school", "UHOH! Use a whole-number task number from your list. Type list to check."},
+            {"tag 0 #bad", "UHOH! No task has that number. Type list to check your task numbers."},
+            {"tag 9 school", "UHOH! No task has that number. Type list to check your task numbers."},
             {"tag 1 #school", Task.INVALID_TAG_MESSAGE},
             {"untag 1 _bad", Task.INVALID_TAG_MESSAGE},
             {"todo sleep /tag", "UHOH! Each /tag must be followed by one tag name."},
@@ -98,7 +99,7 @@ public class TaggingTest {
             {"deadline report /tag school /by 2026-10-01",
                 "UHOH! Put tags at the end using /tag TAG for each tag."},
             {"todo sleep /tag good /tag #bad", Task.INVALID_TAG_MESSAGE},
-            {"todo /tag school", "UHOH! The activity of a todo cannot be empty!"}
+            {"todo /tag school", "OOPSIE! What's the task? Try: todo exercise"}
         };
         for (String[] entry : cases) {
             assertEquals(entry[1], app.getResponse(entry[0]), entry[0]);

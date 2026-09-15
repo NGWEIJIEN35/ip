@@ -16,11 +16,11 @@ public class UiTest {
         ui.showTaskMarked(task);
 
         String expectedResponse = String.join(System.lineSeparator(),
-                "Well done! You completed:",
+                "Task completed! You finished:",
                 "",
                 "[T] [X] read chapter",
                 "",
-                "Keep the momentum going! You can do it!");
+                "Another commitment kept. Be proud of yourself, champ - keep that momentum going!");
         assertEquals(expectedResponse, ui.getLastResponse());
     }
 }

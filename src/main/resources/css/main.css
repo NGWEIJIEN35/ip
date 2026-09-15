@@ -3,7 +3,7 @@
 .app-subtitle { -fx-text-fill: #f2cf62; -fx-font-size: 12px; }
 .hype-title { -fx-text-fill: #f2cf62; -fx-font-size: 32px; -fx-font-weight: bold; -fx-font-style: italic; }
 .coach-caption { -fx-text-fill: #d6e7de; }
-.coach-message { -fx-background-color: #fff7dd; -fx-background-radius: 16; -fx-padding: 18; -fx-text-fill: #174f43; -fx-font-size: 17px; -fx-font-weight: bold; -fx-alignment: center; -fx-text-alignment: center; }
+.coach-message { -fx-background-color: #fff7dd; -fx-background-radius: 16; -fx-padding: 18; -fx-text-fill: #174f43; -fx-font-size: 16px; -fx-font-weight: normal; -fx-alignment: center; -fx-text-alignment: center; }
 .workspace { -fx-padding: 24 26 18 26; }
 .workspace-header { -fx-padding: 0 0 20 0; }
 .page-title { -fx-font-size: 29px; -fx-font-weight: bold; -fx-text-fill: #153e34; }

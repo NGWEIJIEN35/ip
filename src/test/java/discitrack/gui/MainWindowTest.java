@@ -135,9 +135,9 @@ public class MainWindowTest {
                 click(root, "View tasks");
                 assertTrue(app.getTasks().isEmpty());
                 Label coach = (Label) root.lookup("#coachMessage");
-                assertTrue(coach.getText().contains("ALL CLEAR"));
+                assertTrue(coach.getText().contains("Zero tasks"));
                 assertTrue(root.lookupAll(".card-title").stream().map(node -> ((Label) node).getText())
-                        .anyMatch(text -> text.contains("Congratulations")));
+                        .anyMatch(text -> text.contains("All clear")));
                 snapshot(root, "desk-empty");
                 assertTrue(scene.getRoot() == root);
                 completed.complete(null);

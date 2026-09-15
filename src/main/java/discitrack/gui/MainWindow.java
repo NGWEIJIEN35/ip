@@ -66,9 +66,9 @@ public class MainWindow {
      */
     public void setDisciTrack(DisciTrack disciTrack) {
         this.disciTrack = disciTrack;
-        showResponse("COACH IS IN!", disciTrack.getGreeting(), disciTrack.hasLoadError(), false);
+        showResponse("Coach is in!", disciTrack.getGreeting(), disciTrack.hasLoadError(), false);
         if (!disciTrack.hasLoadError() && disciTrack.getTasks().isEmpty()) {
-            coachMessage.setText("ALL CLEAR, CHAMP! Enjoy the breathing room. Next win? Whenever you're ready!");
+            coachMessage.setText("Zero tasks. Maximum breathing room. Enjoy it, champ!");
             celebrate();
         }
         refreshTasks();
@@ -136,10 +136,12 @@ public class MainWindow {
         String body = response.replaceAll("(\\R){2,}", "\n");
         if (!hasError && command.equals("list")) {
             body = disciTrack.getTasks().isEmpty()
-                    ? "Congratulations! Nothing on your list. Take a breather, champ. Your next win awaits!"
-                    : "Your task board is ready. Pick one and LET'S GOOO!";
+                    ? "All clear, champ! Nothing on the board. Enjoy the breather - coach approves."
+                    : "Here's the lineup. Pick your next win and Let's gooo!";
         } else if (!hasError && command.equals("find")) {
-            body = "Matching tasks are shown below. Show all brings back your full list.";
+            body = disciTrack.getMatchingTasks(searchKeyword).isEmpty()
+                    ? "Nothing on the radar, champ. Try another keyword or hit Show all."
+                    : "Scouting report is in! Here's what matches. Hit Show all for the full lineup.";
         } else if (!hasError && command.equals("help")) {
             body = "The playbook is open. Pick your move, champ!";
         }
@@ -237,37 +239,37 @@ public class MainWindow {
 
     private String getHeading(String command, boolean hasError) {
         if (hasError) {
-            return "LET'S FIX THIS";
+            return "UHOH!";
         }
         if (command.equals("list") && disciTrack.getTasks().isEmpty()) {
-            return "ALL CLEAR, CHAMP!";
+            return "All clear, champ!";
         }
         return switch (command) {
-            case "mark" -> "TASK CRUSHED!";
-            case "todo", "deadline", "event" -> "ON THE BOARD!";
-            case "list" -> "THE GAME PLAN";
-            case "find", "checkdate" -> "SCOUTING REPORT";
-            case "delete" -> "LINEUP UPDATED";
-            case "unmark" -> "BACK TO TRAINING";
-            case "bye" -> "CATCH YOU NEXT ROUND!";
-            default -> "COACH'S UPDATE";
+            case "mark" -> "Task crushed!";
+            case "todo", "deadline", "event" -> "On the board!";
+            case "list" -> "The game plan";
+            case "find", "checkdate" -> "Scouting report";
+            case "delete" -> "Lineup updated";
+            case "unmark" -> "Back to training";
+            case "bye" -> "Catch you next round!";
+            default -> "Coach's update";
         };
     }
 
     private String getEncouragement(String command, boolean hasError) {
         if (hasError) {
-            return "Small reset. We've got this. Check the details and try again.";
+            return "Check the input and try again, champ. You've got this!";
         }
         if (disciTrack.getTasks().isEmpty() && !command.equals("bye")) {
-            return "ALL CLEAR! Zero tasks on the board. Enjoy the breather, champ. Next round? You've got this!";
+            return "Zero tasks. Maximum breathing room. Enjoy it, champ!";
         }
         return switch (command) {
-            case "mark" -> "LET'S GOOOO! YOU DID THE THING! That's a BIG W. Coach is absolutely losing it!";
-            case "todo", "deadline", "event" -> "IT'S ON THE BOARD! Now let's turn 'I'll do it' into 'I DID IT!'";
-            case "list" -> "GAME FACE ON! Pick your next win. The list isn't going to defeat itself!";
+            case "mark" -> "Let's goooo! You did the thing! That's a big W. Coach is absolutely proud of you!";
+            case "todo", "deadline", "event" -> "IT'S On the board! Now let's turn 'I'll do it' into 'I DID IT!'";
+            case "list" -> "Game face on! One task at a time. We've got this!";
             case "unmark" -> "Back to training. We'll call that a practice rep.";
             case "bye" -> "Rest up, champ. We'll go again next time.";
-            default -> "LOCKED IN! One task, one win. LET'S MAKE IT HAPPEN!";
+            default -> "Locked in! One task, one win. Let's make it happen!";
         };
     }
 
@@ -295,9 +297,9 @@ public class MainWindow {
         if (matchingTasks.isEmpty()) {
             boolean isEmptyList = disciTrack.getTasks().isEmpty();
             String emptyMessage = isEmptyList
-                    ? "ALL CLEAR! Congratulations, champ! Nothing on the list. Recharge and come back swinging!"
-                    : "No matching tasks. Try another keyword or choose Show all.";
-            taskContainer.getChildren().add(label(emptyMessage, isEmptyList ? "card-title" : "muted"));
+                    ? "All clear, champ! Nothing on the board. Enjoy the breather - coach approves."
+                    : "Nothing on the radar, champ. Try another keyword or hit Show all.";
+            taskContainer.getChildren().add(label(emptyMessage, "card-body"));
         }
         int number = 1;
         for (Task task : disciTrack.getTasks()) {

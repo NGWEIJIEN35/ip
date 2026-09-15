@@ -19,13 +19,13 @@ public class DisciTrackTest {
 
         String response = disciTrack.getResponse("todo revise JavaFX");
 
-        assertTrue(response.contains("I've added this task"));
+        assertTrue(response.contains("Your next challenge:"));
         assertTrue(response.contains("revise JavaFX"));
-        assertTrue(response.contains("Lock in!"));
+        assertTrue(response.contains("doing it!"));
 
         String completionResponse = disciTrack.getResponse("mark 1");
-        assertTrue(completionResponse.contains("Well done! You completed"));
-        assertTrue(completionResponse.contains("Keep the momentum going!"));
+        assertTrue(completionResponse.contains("Task completed! You finished"));
+        assertTrue(completionResponse.contains("keep that momentum going!"));
     }
 
     @Test
@@ -57,7 +57,7 @@ public class DisciTrackTest {
         String greeting = disciTrack.getGreeting();
 
         assertTrue(greeting.contains("your discipline coach"));
-        assertTrue(greeting.contains("What are we getting done today?"));
+        assertTrue(greeting.contains("Are you ready to crush today's tasks?"));
     }
 
     @Test
@@ -99,10 +99,10 @@ public class DisciTrackTest {
         assertTrue(unmarkResponse.contains("[ ] exercise"));
 
         String deleteResponse = disciTrack.getResponse("delete 1");
-        assertTrue(deleteResponse.contains("deleted this task"));
+        assertTrue(deleteResponse.contains("Off the board!"));
 
         String byeResponse = disciTrack.getResponse("bye");
-        assertTrue(byeResponse.contains("Bye bye"));
+        assertTrue(byeResponse.contains("Coach out!"));
     }
 
     @Test

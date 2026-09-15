@@ -68,7 +68,8 @@ public class Parser {
         } else if (commandWord.equals("delete")) {
             return new DeleteCommand(parseTaskNumber(arguments));
         } else {
-            throw new DisciTrackException("UHOH, I didn't know what you mean.");
+            throw new DisciTrackException("UHOH! I don't recognise that command. "
+                    + "Type help or click Commands to see what you can use.");
         }
     }
 
@@ -134,13 +135,14 @@ public class Parser {
      */
     private static int parseTaskNumber(String taskNumberString) throws DisciTrackException {
         if (taskNumberString.isEmpty()) {
-            throw new DisciTrackException("UHOH! Please enter a task number!");
+            throw new DisciTrackException("OOPSIE! I need a task number after the command. "
+                    + "Use list to check task numbers.");
         }
 
         try {
             return Integer.parseInt(taskNumberString);
         } catch (NumberFormatException e) {
-            throw new DisciTrackException("UHOH! Please enter a valid task number!");
+            throw new DisciTrackException("UHOH! Use a whole-number task number from your list. Type list to check.");
         }
     }
 
@@ -153,13 +155,13 @@ public class Parser {
      */
     private static LocalDate parseCheckDate(String date) throws DisciTrackException {
         if (date.isEmpty()) {
-            throw new DisciTrackException("UHOH! Please enter a date to check!");
+            throw new DisciTrackException("OOPSIE! I need a date. Try: checkdate 2026-09-30");
         }
 
         try {
             return LocalDate.parse(date);
         } catch (DateTimeParseException e) {
-            throw new DisciTrackException("UHOH! Please enter the check date in yyyy-MM-dd format!");
+            throw new DisciTrackException("UHOH! Use a valid date in yyyy-MM-dd format, for example 2026-09-30.");
         }
     }
 
@@ -172,7 +174,7 @@ public class Parser {
      */
     private static String parseFindKeyword(String keyword) throws DisciTrackException {
         if (keyword.isEmpty()) {
-            throw new DisciTrackException("UHOH! Please enter a keyword to find!");
+            throw new DisciTrackException("OOPSIE! I need a keyword. Try: find exercise");
         }
 
         return keyword;
@@ -187,7 +189,7 @@ public class Parser {
      */
     private static Todo parseTodo(String activity) throws DisciTrackException {
         if (activity.isEmpty()) {
-            throw new DisciTrackException("UHOH! The activity of a todo cannot be empty!");
+            throw new DisciTrackException("OOPSIE! What's the task? Try: todo exercise");
         }
 
         return new Todo(activity);
@@ -202,30 +204,31 @@ public class Parser {
      */
     private static Deadline parseDeadline(String input) throws DisciTrackException {
         if (input.isEmpty()) {
-            throw new DisciTrackException("UHOH! The activity of a deadline cannot be empty!");
+            throw new DisciTrackException("OOPSIE! I need a task description. Try: deadline homework /by 2026-09-30");
         }
 
         String[] parts = input.split("\\s+/by\\s+", 2);
 
         if (parts.length < 2) {
-            throw new DisciTrackException("UHOH! A deadline needs a /by time!");
+            throw new DisciTrackException("OOPSIE! Include /by and a date. Try: deadline homework /by 2026-09-30");
         }
 
         String activity = parts[0].trim();
         String time = parts[1].trim();
 
         if (activity.isEmpty()) {
-            throw new DisciTrackException("UHOH! The activity of a deadline cannot be empty!");
+            throw new DisciTrackException("OOPSIE! I need a task description. Try: deadline homework /by 2026-09-30");
         }
 
         if (time.isEmpty()) {
-            throw new DisciTrackException("UHOH! The time of a deadline cannot be empty!");
+            throw new DisciTrackException("OOPSIE! Add a date after /by, for example /by 2026-09-30.");
         }
 
         try {
             return new Deadline(activity, LocalDate.parse(time));
         } catch (DateTimeParseException e) {
-            throw new DisciTrackException("UHOH! Please enter the deadline date in yyyy-MM-dd format!");
+            throw new DisciTrackException("UHOH! Use a valid deadline date in yyyy-MM-dd format, "
+                    + "for example 2026-09-30.");
         }
     }
 
@@ -238,7 +241,7 @@ public class Parser {
      */
     private static Event parseEvent(String input) throws DisciTrackException {
         if (input.isEmpty()) {
-            throw new DisciTrackException("UHOH! The activity of an event cannot be empty!");
+            throw new DisciTrackException("OOPSIE! I need an event description before /from.");
         }
 
         String[] eventAndDates = splitEventDetails(input, "/from");
@@ -262,15 +265,15 @@ public class Parser {
     private static void validateEventDetails(String activity, String startDate, String endDate)
             throws DisciTrackException {
         if (activity.isEmpty()) {
-            throw new DisciTrackException("UHOH! The activity of an event cannot be empty!");
+            throw new DisciTrackException("OOPSIE! I need an event description before /from.");
         }
 
         if (startDate.isEmpty()) {
-            throw new DisciTrackException("UHOH! The start time of an event cannot be empty!");
+            throw new DisciTrackException("OOPSIE! Add a date after /from, for example /from 2026-09-30.");
         }
 
         if (endDate.isEmpty()) {
-            throw new DisciTrackException("UHOH! The end time of an event cannot be empty!");
+            throw new DisciTrackException("OOPSIE! Add a date after /to, for example /to 2026-10-01.");
         }
     }
 
@@ -279,7 +282,7 @@ public class Parser {
         try {
             return new Event(activity, LocalDate.parse(startDate), LocalDate.parse(endDate));
         } catch (DateTimeParseException e) {
-            throw new DisciTrackException("UHOH! Please enter event dates in yyyy-MM-dd format!");
+            throw new DisciTrackException("UHOH! Use valid event dates in yyyy-MM-dd format, for example 2026-09-30.");
         }
     }
 }
