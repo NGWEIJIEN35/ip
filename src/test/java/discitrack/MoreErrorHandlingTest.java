@@ -8,9 +8,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
+import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestFactory;
 import org.junit.jupiter.api.io.TempDir;
 
 import discitrack.exception.SaveException;
@@ -28,12 +32,8 @@ public class MoreErrorHandlingTest {
     @TempDir
     public Path directory;
 
-    @Test
-    public void invalidCommands_specificErrors_preserveTasksAndFile() throws IOException {
-        Path file = directory.resolve("tasks.txt");
-        DisciTrack app = new DisciTrack(file.toString());
-        app.getResponse("todo existing");
-        String original = Files.readString(file);
+    @TestFactory
+    public Stream<DynamicTest> invalidCommands_specificErrors_preserveTasksAndFile() {
         String[][] cases = {
             {"deadline /by 2026-09-30", "description"},
             {"deadline report /by", "date after /by"},
@@ -60,14 +60,18 @@ public class MoreErrorHandlingTest {
             {"todo read\nnotes", "one line"},
             {"checkdate 2026-02-30", "valid date"}
         };
-        for (String[] entry : cases) {
+        return Arrays.stream(cases).map(entry -> DynamicTest.dynamicTest(entry[0], () -> {
+            Path file = Files.createTempDirectory(directory, "invalid-").resolve("tasks.txt");
+            DisciTrack app = new DisciTrack(file.toString());
+            app.getResponse("todo existing");
+            String original = Files.readString(file);
             assertTrue(app.getResponse(entry[0]).contains(entry[1]), entry[0]);
             assertTrue(app.hasResponseError(), entry[0]);
             assertFalse(app.shouldExit());
             assertEquals(1, app.getTasks().size());
             assertFalse(app.getTasks().getFirst().isDone());
             assertEquals(original, Files.readString(file), entry[0]);
-        }
+        }));
     }
 
     @Test
