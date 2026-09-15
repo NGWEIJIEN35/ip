@@ -33,8 +33,8 @@ public class Main extends Application {
 
             stage.setScene(scene);
             stage.setTitle("DisciTrack");
-            stage.setMinHeight(420);
-            stage.setMinWidth(420);
+            stage.setMinHeight(580);
+            stage.setMinWidth(660);
 
             MainWindow mainWindow = fxmlLoader.getController();
             mainWindow.setDisciTrack(new DisciTrack());

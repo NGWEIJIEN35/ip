@@ -1,7 +1,9 @@
 package discitrack;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 
 import discitrack.command.Command;
 import discitrack.exception.DisciTrackException;
@@ -23,6 +25,7 @@ public class DisciTrack {
     private final Ui ui;
     private boolean shouldExit;
     private String loadError;
+    private boolean hasResponseError;
 
     /**
      * Creates a DisciTrack application for use by the graphical user interface.
@@ -44,6 +47,48 @@ public class DisciTrack {
         ui = new Ui(shouldPrintResponses);
         storage = new Storage(filePath);
         tasks = new TaskList(loadTasks());
+    }
+
+    /**
+     * Indicates whether the GUI should present the latest response as an error.
+     *
+     * @return whether a command or initial load failed.
+     */
+    public boolean hasResponseError() {
+        return hasResponseError;
+    }
+
+    public boolean hasLoadError() {
+        return loadError != null;
+    }
+
+    /**
+     * Returns a read-only list for rendering the task board; commands own task mutations.
+     *
+     * @return tasks in their original command-number order.
+     */
+    public List<Task> getTasks() {
+        return List.copyOf(tasks.asList());
+    }
+
+    /**
+     * Finds board results using the same matching rules as the find command.
+     *
+     * @param keyword description text to find.
+     * @return matching tasks in their original order.
+     */
+    public List<Task> getMatchingTasks(String keyword) {
+        return List.copyOf(tasks.findTasksByKeyword(keyword));
+    }
+
+    /**
+     * Returns the date command's matches for the GUI board.
+     *
+     * @param date date to match.
+     * @return matching deadlines and events.
+     */
+    public List<Task> getTasksOnDate(LocalDate date) {
+        return List.copyOf(tasks.findTasksByDate(date));
     }
 
     /**
@@ -100,7 +145,9 @@ public class DisciTrack {
     }
 
     private boolean executeCommand(String input) {
+        hasResponseError = false;
         if (loadError != null && !input.trim().equals("help") && !input.trim().equals("bye")) {
+            hasResponseError = true;
             ui.showError(LOAD_BLOCKED_MESSAGE);
             return false;
         }
@@ -109,8 +156,10 @@ public class DisciTrack {
             parsedCommand.execute(tasks, ui, storage);
             return parsedCommand.isExit();
         } catch (DisciTrackException e) {
+            hasResponseError = true;
             ui.showError(e.getMessage());
         } catch (IOException e) {
+            hasResponseError = true;
             ui.showSaveError();
         }
 
